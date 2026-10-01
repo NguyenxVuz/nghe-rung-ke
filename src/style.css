@@ -401,8 +401,6 @@ h1 em, h2 em { color: var(--gold); font-weight: inherit; }
 .preview-toolbar { min-height: 41px; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; font-size: 8px; text-transform: uppercase; letter-spacing: .1em; color: #5d7468; }
 .preview-toolbar .live-dot { width: 6px; height: 6px; }
 #thank-card { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; background: #f5f1e6; }
-#thank-card.photo-positioning { cursor: grab; touch-action: none; }
-#thank-card.photo-positioning:active { cursor: grabbing; }
 .preview-hint { margin: 10px 4px 0; color: #71837a; text-align: center; font-size: 8px; }
 
 footer { padding: 58px clamp(22px, 7vw, 110px) 25px; background: #071c15; color: rgba(255,255,255,.66); display: grid; grid-template-columns: 1.4fr .7fr 1fr .5fr; gap: 45px; }
