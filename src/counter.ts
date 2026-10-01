@@ -485,9 +485,7 @@ export const setupForestPlanting = (): void => {
   updateSharingProgress();
 
   const openFacebookShare = (): void => {
-    const projectUrl = new URL('./', window.location.href).href;
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(projectUrl)}`;
-    window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    window.open('https://www.facebook.com/', '_blank', 'noopener,noreferrer');
   };
 
   const updatePlantSubmitState = (): void => {
