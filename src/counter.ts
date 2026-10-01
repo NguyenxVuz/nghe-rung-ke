@@ -38,15 +38,13 @@ const TARGET_TREES = 200;
 const createShareCaption = (): string => `🌳 CÙNG THẮP XANH BẢN ĐỒ BÙ GIA MẬP
 
 Mời bạn cùng tham gia bằng 3 bước đơn giản:
-
 1️⃣ Truy cập website: ${location.origin}
-
 2️⃣ Trồng một cây ảo và ghi dấu mầm xanh trên bản đồ số Bù Gia Mập.
-
 3️⃣ Chia sẻ dự án “Nghe Rừng Kể” lên Facebook hoặc TikTok cá nhân ở chế độ công khai.
 
-Mỗi lượt chia sẻ là một lần câu chuyện về rừng được đi xa hơn.
+🌱 Mỗi lượt chia sẻ là một lần câu chuyện về rừng được đi xa hơn.
 
+📬 Kết nối:
 Email: Ngherungke2026@gmail.com
 TikTok: https://www.tiktok.com/@nghe.rng.k
 
