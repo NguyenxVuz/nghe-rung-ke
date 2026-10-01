@@ -5,12 +5,14 @@ import brushMaskUrl from './assets/thank-you-brush-mask.png';
 interface CardState {
   name: string;
   photo: HTMLImageElement | null;
+  photoPosition: { x: number; y: number };
 }
 
 const canvas = document.querySelector<HTMLCanvasElement>('#thank-card');
 const nameInput = document.querySelector<HTMLInputElement>('#supporter-name');
 const nameLength = document.querySelector<HTMLElement>('#name-length');
 const photoInput = document.querySelector<HTMLInputElement>('#supporter-photo');
+const photoPositionHint = document.querySelector<HTMLElement>('#photo-position-hint');
 const resetPhotoButton = document.querySelector<HTMLButtonElement>('#reset-photo');
 const photoStatus = document.querySelector<HTMLElement>('#photo-status');
 const downloadButton = document.querySelector<HTMLButtonElement>('#download-card');
@@ -34,6 +36,7 @@ const queryName = new URLSearchParams(location.search).get('name')?.trim();
 const state: CardState = {
   name: queryName || sessionStorage.getItem('nghe-rung-ke:last-supporter') || 'Người bạn của rừng',
   photo: null,
+  photoPosition: { x: 0.5, y: 0.5 },
 };
 
 const template = new Image();
@@ -60,12 +63,13 @@ const drawImageCover = (
   y: number,
   width: number,
   height: number,
+  position: { x: number; y: number },
 ): void => {
   const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
   const sourceWidth = width / scale;
   const sourceHeight = height / scale;
-  const sourceX = (image.naturalWidth - sourceWidth) / 2;
-  const sourceY = (image.naturalHeight - sourceHeight) / 2;
+  const sourceX = (image.naturalWidth - sourceWidth) * position.x;
+  const sourceY = (image.naturalHeight - sourceHeight) * position.y;
   targetContext.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
 };
 
@@ -85,7 +89,7 @@ const drawCard = (): void => {
 
   if (state.photo) {
     photoContext.clearRect(0, 0, photoCanvas.width, photoCanvas.height);
-    drawImageCover(photoContext, state.photo, photoBounds.x, photoBounds.y, photoBounds.width, photoBounds.height);
+    drawImageCover(photoContext, state.photo, photoBounds.x, photoBounds.y, photoBounds.width, photoBounds.height, state.photoPosition);
     photoContext.globalCompositeOperation = 'destination-in';
     photoContext.drawImage(brushMask, 0, 0, photoCanvas.width, photoCanvas.height);
     photoContext.globalCompositeOperation = 'source-over';
@@ -134,6 +138,9 @@ const loadUploadedPhoto = (file: File): void => {
   const image = new Image();
   image.onload = () => {
     state.photo = image;
+    state.photoPosition = { x: 0.5, y: 0.5 };
+    canvas.classList.add('photo-positioning');
+    if (photoPositionHint) photoPositionHint.hidden = false;
     drawCard();
     photoStatus.textContent = `Đã chọn: ${file.name}`;
     photoStatus.classList.remove('error');
@@ -146,6 +153,60 @@ const loadUploadedPhoto = (file: File): void => {
   };
   image.src = objectUrl;
 };
+
+let photoDragStart: { pointerId: number; clientX: number; clientY: number; x: number; y: number } | null = null;
+
+const getCanvasPosition = (event: PointerEvent): { x: number; y: number } => {
+  const bounds = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - bounds.left) * canvas.width / bounds.width,
+    y: (event.clientY - bounds.top) * canvas.height / bounds.height,
+  };
+};
+
+canvas.addEventListener('pointerdown', (event) => {
+  if (!state.photo) return;
+  const position = getCanvasPosition(event);
+  if (position.x < photoBounds.x || position.x > photoBounds.x + photoBounds.width
+    || position.y < photoBounds.y || position.y > photoBounds.y + photoBounds.height) return;
+
+  event.preventDefault();
+  canvas.setPointerCapture(event.pointerId);
+  photoDragStart = {
+    pointerId: event.pointerId,
+    clientX: event.clientX,
+    clientY: event.clientY,
+    ...state.photoPosition,
+  };
+});
+
+canvas.addEventListener('pointermove', (event) => {
+  if (!photoDragStart || event.pointerId !== photoDragStart.pointerId || !state.photo) return;
+
+  const scale = Math.max(
+    photoBounds.width / state.photo.naturalWidth,
+    photoBounds.height / state.photo.naturalHeight,
+  );
+  const movableWidth = state.photo.naturalWidth * scale - photoBounds.width;
+  const movableHeight = state.photo.naturalHeight * scale - photoBounds.height;
+  const bounds = canvas.getBoundingClientRect();
+  const deltaX = (event.clientX - photoDragStart.clientX) * canvas.width / bounds.width;
+  const deltaY = (event.clientY - photoDragStart.clientY) * canvas.height / bounds.height;
+
+  state.photoPosition = {
+    x: movableWidth > 0 ? Math.max(0, Math.min(1, photoDragStart.x - deltaX / movableWidth)) : 0.5,
+    y: movableHeight > 0 ? Math.max(0, Math.min(1, photoDragStart.y - deltaY / movableHeight)) : 0.5,
+  };
+  drawCard();
+});
+
+const finishPhotoDrag = (event: PointerEvent): void => {
+  if (photoDragStart?.pointerId === event.pointerId) photoDragStart = null;
+};
+
+canvas.addEventListener('pointerup', finishPhotoDrag);
+canvas.addEventListener('pointercancel', finishPhotoDrag);
+canvas.addEventListener('lostpointercapture', finishPhotoDrag);
 
 nameInput.value = state.name;
 nameLength.textContent = `${state.name.length}/32`;
@@ -162,6 +223,9 @@ photoInput.addEventListener('change', () => {
 
 resetPhotoButton.addEventListener('click', () => {
   state.photo = null;
+  state.photoPosition = { x: 0.5, y: 0.5 };
+  canvas.classList.remove('photo-positioning');
+  if (photoPositionHint) photoPositionHint.hidden = true;
   photoInput.value = '';
   photoStatus.textContent = 'Đang dùng ảnh mặc định của dự án.';
   photoStatus.classList.remove('error');
