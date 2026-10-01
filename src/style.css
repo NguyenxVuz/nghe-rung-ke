@@ -472,6 +472,11 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
 .certificate-preview-frame canvas.is-positioning:active { cursor: grabbing; }
 .certificate-preview-frame canvas.is-animating { animation: certificate-preview-reveal .38s ease-out both; }
 .certificate-preview-hint { margin: -6px 4px 14px; color: var(--muted); text-align: center; font-size: 10px; }
+.certificate-zoom-control { display: grid; gap: 8px; max-width: 360px; margin: -3px auto 16px; }
+.certificate-zoom-control[hidden] { display: none; }
+.certificate-zoom-control label { display: flex; justify-content: space-between; color: var(--forest-700); font-size: 11px; font-weight: 700; }
+.certificate-zoom-control output { color: var(--muted); font-variant-numeric: tabular-nums; }
+.certificate-zoom-control input { width: 100%; accent-color: var(--forest-600); cursor: pointer; }
 @keyframes certificate-preview-reveal { from { opacity: .65; transform: scale(.985); } to { opacity: 1; transform: scale(1); } }
 .certificate-photo-actions { display: grid; gap: 9px; margin: 0 auto 4px; }
 .certificate-photo-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }

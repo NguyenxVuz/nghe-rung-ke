@@ -167,7 +167,11 @@
           <div class="sharing-card-heading"><span class="sharing-number" data-certificate-number>01</span><div><p class="eyebrow"><span></span>Bước 1</p><h3 id="certificate-heading">Nhận chứng nhận</h3></div><span class="sharing-check" id="certificate-check" aria-hidden="true"></span></div>
           <p class="sharing-description">Lưu chứng nhận trồng cây của bạn để sử dụng khi chia sẻ lên Facebook.</p>
           <div class="certificate-preview-frame"><canvas id="certificate-preview" width="1080" height="1350" aria-label="Chứng nhận gieo mầm xanh cá nhân hóa"></canvas></div>
-          <p class="certificate-preview-hint" id="certificate-position-hint" hidden>Kéo ảnh trên chứng nhận để căn chỉnh vị trí.</p>
+          <p class="certificate-preview-hint" id="certificate-position-hint" hidden>Kéo ảnh ngang hoặc dọc để căn chỉnh. Dùng thanh bên dưới để phóng to hoặc thu nhỏ.</p>
+          <div class="certificate-zoom-control" id="certificate-zoom-control" hidden>
+            <label for="certificate-photo-zoom">Thu phóng ảnh <output id="certificate-photo-zoom-value" for="certificate-photo-zoom">100%</output></label>
+            <input id="certificate-photo-zoom" type="range" min="100" max="300" step="5" value="100" aria-label="Thu phóng ảnh trên chứng nhận" />
+          </div>
           <div class="certificate-photo-actions">
             <input class="certificate-photo-input" id="certificate-photo-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Chọn ảnh thay cho ảnh trên chứng nhận" />
             <button class="certificate-photo-picker" id="change-certificate-photo" type="button">

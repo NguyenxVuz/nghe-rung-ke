@@ -92,6 +92,8 @@ interface CertificatePhotoPosition {
   y: number;
 }
 
+const CERTIFICATE_PHOTO_BOUNDS = { x: 30, y: 120, width: 708, height: 480 };
+
 interface CertificatePhotoBounds {
   x: number;
   y: number;
@@ -120,10 +122,10 @@ const getCertificatePhotoBounds = (template: HTMLImageElement): CertificatePhoto
   const scaleX = templateWidth / template.naturalWidth;
   const scaleY = templateHeight / template.naturalHeight;
   return {
-    x: (1080 - templateWidth) / 2 + 71 * scaleX,
-    y: (1350 - templateHeight) / 2 + 165 * scaleY,
-    width: 608 * scaleX,
-    height: 395 * scaleY,
+    x: (1080 - templateWidth) / 2 + CERTIFICATE_PHOTO_BOUNDS.x * scaleX,
+    y: (1350 - templateHeight) / 2 + CERTIFICATE_PHOTO_BOUNDS.y * scaleY,
+    width: CERTIFICATE_PHOTO_BOUNDS.width * scaleX,
+    height: CERTIFICATE_PHOTO_BOUNDS.height * scaleY,
   };
 };
 
@@ -145,6 +147,7 @@ const createCertificateCanvas = async (
   tree: Pick<TreeParticipant, 'name'>,
   photo: HTMLImageElement | null,
   photoPosition: CertificatePhotoPosition,
+  photoZoom: number,
 ): Promise<HTMLCanvasElement> => {
   const [{ template, background }] = await Promise.all([loadCertificateAssets(), document.fonts.ready]);
   const canvas = document.createElement('canvas');
@@ -167,7 +170,7 @@ const createCertificateCanvas = async (
   if (photo) {
     const photoBounds = getCertificatePhotoBounds(template);
     const { x: photoX, y: photoY, width: photoWidth, height: photoHeight } = photoBounds;
-    const photoScale = Math.max(photoWidth / photo.naturalWidth, photoHeight / photo.naturalHeight);
+    const photoScale = Math.max(photoWidth / photo.naturalWidth, photoHeight / photo.naturalHeight) * photoZoom;
     const sourceWidth = photoWidth / photoScale;
     const sourceHeight = photoHeight / photoScale;
     const sourceX = (photo.naturalWidth - sourceWidth) * photoPosition.x;
@@ -281,6 +284,9 @@ export const setupForestPlanting = (): void => {
   const downloadCertificate = document.querySelector<HTMLButtonElement>('#download-certificate');
   const certificatePreview = document.querySelector<HTMLCanvasElement>('#certificate-preview');
   const certificatePositionHint = document.querySelector<HTMLElement>('#certificate-position-hint');
+  const certificateZoomControl = document.querySelector<HTMLElement>('#certificate-zoom-control');
+  const certificatePhotoZoomInput = document.querySelector<HTMLInputElement>('#certificate-photo-zoom');
+  const certificatePhotoZoomValue = document.querySelector<HTMLOutputElement>('#certificate-photo-zoom-value');
   const certificatePhotoInput = document.querySelector<HTMLInputElement>('#certificate-photo-input');
   const changeCertificatePhoto = document.querySelector<HTMLButtonElement>('#change-certificate-photo');
   const resetCertificatePhoto = document.querySelector<HTMLButtonElement>('#reset-certificate-photo');
@@ -303,11 +309,12 @@ export const setupForestPlanting = (): void => {
   const locationHelp = document.querySelector<HTMLElement>('#plant-location-help');
   let selectedPlantLocation: PlantLocation | null = null;
   let participantName = '';
-  if (!formStep || !resultStep || !verifyStep || !completeStep || !shareStep || !proofUrlInput || !proofConsent || !confirmPlant || !verifyError || !copyCaption || !sendShare || !downloadCertificate || !certificatePreview || !certificatePositionHint || !certificatePhotoInput || !changeCertificatePhoto || !resetCertificatePhoto || !certificatePhotoStatus || !certificateStatus || !captionStatus || !shareCaptionPreview || !shareReadiness || !facebookSharingCard || !certificateCheck || !captionCheck || !facebookCheck || !readyPost || !viewForestMap || !completeSupporter || !backToPlant || !backToShare || !backToVerify || !plantSubmit || !locationHelp) return;
+  if (!formStep || !resultStep || !verifyStep || !completeStep || !shareStep || !proofUrlInput || !proofConsent || !confirmPlant || !verifyError || !copyCaption || !sendShare || !downloadCertificate || !certificatePreview || !certificatePositionHint || !certificateZoomControl || !certificatePhotoZoomInput || !certificatePhotoZoomValue || !certificatePhotoInput || !changeCertificatePhoto || !resetCertificatePhoto || !certificatePhotoStatus || !certificateStatus || !captionStatus || !shareCaptionPreview || !shareReadiness || !facebookSharingCard || !certificateCheck || !captionCheck || !facebookCheck || !readyPost || !viewForestMap || !completeSupporter || !backToPlant || !backToShare || !backToVerify || !plantSubmit || !locationHelp) return;
   let certificateCanvas: HTMLCanvasElement | null = null;
   let certificateTree: Pick<TreeParticipant, 'name'> | null = null;
   let certificatePhoto: HTMLImageElement | null = null;
   let certificatePhotoPosition: CertificatePhotoPosition = { x: 0.5, y: 0.5 };
+  let certificatePhotoZoom = 1;
   let certificateDownloaded = false;
   let captionCopied = false;
   let certificateGeneration = 0;
@@ -348,12 +355,16 @@ export const setupForestPlanting = (): void => {
     certificateTree = null;
     certificatePhoto = null;
     certificatePhotoPosition = { x: 0.5, y: 0.5 };
+    certificatePhotoZoom = 1;
     certificateDownloaded = false;
     captionCopied = false;
     downloadCertificate.disabled = false;
     certificatePreview.getContext('2d')?.clearRect(0, 0, certificatePreview.width, certificatePreview.height);
     certificatePreview.classList.remove('is-animating', 'is-positioning');
     certificatePositionHint.hidden = true;
+    certificateZoomControl.hidden = true;
+    certificatePhotoZoomInput.value = '100';
+    certificatePhotoZoomValue.value = '100%';
     certificatePhotoInput.value = '';
     resetCertificatePhoto.hidden = true;
     certificatePhotoStatus.textContent = 'Chọn ảnh từ thiết bị để thay ảnh phong cảnh trên chứng nhận.';
@@ -366,6 +377,7 @@ export const setupForestPlanting = (): void => {
     tree: Pick<TreeParticipant, 'name'>,
     photo: HTMLImageElement | null = certificatePhoto,
     photoPosition: CertificatePhotoPosition = certificatePhotoPosition,
+    photoZoom: number = certificatePhotoZoom,
   ): Promise<void> => {
     const generation = ++certificateGeneration;
     certificateTree = tree;
@@ -373,11 +385,12 @@ export const setupForestPlanting = (): void => {
     downloadCertificate.disabled = true;
     certificateStatus.textContent = 'Đang chuẩn bị chứng nhận của bạn…';
     updateSharingProgress();
-    const canvas = await createCertificateCanvas(tree, photo, photoPosition);
+    const canvas = await createCertificateCanvas(tree, photo, photoPosition, photoZoom);
     if (generation !== certificateGeneration) return;
     certificateCanvas = canvas;
     certificatePhoto = photo;
     certificatePhotoPosition = photoPosition;
+    certificatePhotoZoom = photoZoom;
     const previewContext = certificatePreview.getContext('2d');
     if (!previewContext) throw new Error('Không thể hiển thị chứng nhận xem trước.');
     previewContext.clearRect(0, 0, certificatePreview.width, certificatePreview.height);
@@ -387,6 +400,9 @@ export const setupForestPlanting = (): void => {
     certificatePreview.classList.add('is-animating');
     certificatePreview.classList.toggle('is-positioning', Boolean(photo));
     certificatePositionHint.hidden = !photo;
+    certificateZoomControl.hidden = !photo;
+    certificatePhotoZoomInput.value = String(Math.round(photoZoom * 100));
+    certificatePhotoZoomValue.value = `${Math.round(photoZoom * 100)}%`;
     downloadCertificate.disabled = false;
     resetCertificatePhoto.hidden = !photo;
     certificateStatus.textContent = 'Ảnh PNG tỷ lệ 4:5, phù hợp để đăng bài.';
@@ -425,7 +441,7 @@ export const setupForestPlanting = (): void => {
     const scale = Math.max(
       photoBounds.width / certificatePhoto.naturalWidth,
       photoBounds.height / certificatePhoto.naturalHeight,
-    );
+    ) * certificatePhotoZoom;
     const movableWidth = certificatePhoto.naturalWidth * scale - photoBounds.width;
     const movableHeight = certificatePhoto.naturalHeight * scale - photoBounds.height;
     const bounds = certificatePreview.getBoundingClientRect();
@@ -437,13 +453,24 @@ export const setupForestPlanting = (): void => {
     };
     certificatePhotoPosition = position;
     const tree = certificateTree;
+    const zoom = certificatePhotoZoom;
     if (photoRenderFrame) cancelAnimationFrame(photoRenderFrame);
     photoRenderFrame = requestAnimationFrame(() => {
       photoRenderFrame = 0;
-      void prepareCertificate(tree, certificatePhoto, position).catch((error: unknown) => {
+      void prepareCertificate(tree, certificatePhoto, position, zoom).catch((error: unknown) => {
         console.error('Could not reposition planting certificate photo:', error);
         certificatePhotoStatus.textContent = 'Không thể căn chỉnh ảnh. Vui lòng thử lại.';
       });
+    });
+  });
+  certificatePhotoZoomInput.addEventListener('input', () => {
+    if (!certificatePhoto || !certificateTree) return;
+    const zoom = Number(certificatePhotoZoomInput.value) / 100;
+    certificatePhotoZoomValue.value = `${Math.round(zoom * 100)}%`;
+    const tree = certificateTree;
+    void prepareCertificate(tree, certificatePhoto, certificatePhotoPosition, zoom).catch((error: unknown) => {
+      console.error('Could not zoom planting certificate photo:', error);
+      certificatePhotoStatus.textContent = 'Không thể thu phóng ảnh. Vui lòng thử lại.';
     });
   });
   const finishCertificatePhotoDrag = (event: PointerEvent): void => {
@@ -687,7 +714,7 @@ export const setupForestPlanting = (): void => {
     try {
       const photo = await loadCertificatePhoto(file);
       if (generation !== certificateGeneration) return;
-      await prepareCertificate(tree, photo, { x: 0.5, y: 0.5 });
+      await prepareCertificate(tree, photo, { x: 0.5, y: 0.5 }, 1);
       certificatePhotoStatus.textContent = 'Ảnh chứng nhận đã được cập nhật.';
     } catch (error) {
       console.error('Could not update planting certificate photo:', error);
@@ -701,7 +728,7 @@ export const setupForestPlanting = (): void => {
     if (!certificateTree) return;
     certificatePhotoStatus.textContent = 'Đang khôi phục ảnh mặc định…';
     try {
-      await prepareCertificate(certificateTree, null, { x: 0.5, y: 0.5 });
+      await prepareCertificate(certificateTree, null, { x: 0.5, y: 0.5 }, 1);
       certificatePhotoStatus.textContent = 'Đã khôi phục ảnh mặc định trên chứng nhận.';
     } catch (error) {
       console.error('Could not restore the default planting certificate photo:', error);
