@@ -317,7 +317,6 @@ export const setupForestPlanting = (): void => {
   let certificatePhotoZoom = 1;
   let certificateDownloaded = false;
   let captionCopied = false;
-  let facebookShareStarted = false;
   let certificateGeneration = 0;
 
   shareCaptionPreview.textContent = createShareCaption();
@@ -359,10 +358,9 @@ export const setupForestPlanting = (): void => {
     certificatePhotoZoom = 1;
     certificateDownloaded = false;
     captionCopied = false;
-    facebookShareStarted = false;
     downloadCertificate.disabled = false;
-    readyPost.disabled = true;
-    readyPost.textContent = 'Mở Facebook ở nút phía trên trước';
+    readyPost.disabled = false;
+    readyPost.textContent = 'Xác nhận đồng hành →';
     certificatePreview.getContext('2d')?.clearRect(0, 0, certificatePreview.width, certificatePreview.height);
     certificatePreview.classList.remove('is-animating', 'is-positioning');
     certificatePositionHint.hidden = true;
@@ -837,12 +835,8 @@ export const setupForestPlanting = (): void => {
   });
   sendShare.addEventListener('click', () => {
     openFacebookShare();
-    facebookShareStarted = true;
-    readyPost.disabled = false;
-    readyPost.textContent = 'Xác nhận đồng hành →';
   });
   readyPost.addEventListener('click', () => {
-    if (!facebookShareStarted) return;
     resultStep.hidden = true;
     shareStep.hidden = true;
     verifyStep.hidden = false;
