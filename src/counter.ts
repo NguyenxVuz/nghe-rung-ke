@@ -1,4 +1,11 @@
 import { createTree, confirmTree, getConfirmedTrees } from './services/treeService';
+import {
+  clearPlantingDraft,
+  getPlantingDraft,
+  savePlantingDraft,
+  type PlantingDraft,
+  type PlantingDraftTree,
+} from './services/plantingDraft';
 import type { TreeParticipant } from './types/tree';
 import certificateBackgroundUrl from './assets/thank-you-template.png';
 import certificateTemplateUrl from './assets/plant-certificate-template.png';
@@ -208,7 +215,7 @@ const createCertificateCanvas = async (
   return canvas;
 };
 
-const toTreeRecord = (tree: TreeParticipant): TreeRecord => ({
+const toTreeRecord = (tree: PlantingDraftTree): TreeRecord => ({
     id: tree.id,
     supporter: tree.name,
     proofUrl: tree.post_url ?? undefined,
@@ -226,6 +233,25 @@ const showToast = (message: string): void => {
   toast.textContent = message;
   toast.classList.add('show');
   window.setTimeout(() => toast.classList.remove('show'), 3600);
+};
+
+const loadCertificatePhotoFromDataUrl = (dataUrl: string): Promise<HTMLImageElement> => new Promise((resolve, reject) => {
+  const image = new Image();
+  image.onload = () => resolve(image);
+  image.onerror = () => reject(new Error('Không thể khôi phục ảnh chứng nhận đã lưu.'));
+  image.src = dataUrl;
+});
+
+const persistableCertificatePhoto = (photo: HTMLImageElement): string => {
+  const maxDimension = 900;
+  const scale = Math.min(1, maxDimension / Math.max(photo.naturalWidth, photo.naturalHeight));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(photo.naturalWidth * scale));
+  canvas.height = Math.max(1, Math.round(photo.naturalHeight * scale));
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Không thể lưu ảnh chứng nhận trên trình duyệt này.');
+  context.drawImage(photo, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/jpeg', 0.72);
 };
 
 const renderForest = (state: ForestState): void => {
@@ -316,8 +342,43 @@ export const setupForestPlanting = (): void => {
   let certificateDownloaded = false;
   let captionCopied = false;
   let certificateGeneration = 0;
+  let currentStep: PlantStep = 'PLANT';
+  let plantedTree: PlantingDraftTree | null = null;
+  let certificatePhotoDataUrl: string | null = null;
+  let draftActive = false;
+  let storageFailureNotified = false;
 
   shareCaptionPreview.textContent = createShareCaption();
+
+  const persistDraft = (step: PlantStep = currentStep): void => {
+    if (!draftActive) return;
+    const supporter = form.elements.namedItem('supporter');
+    const species = form.elements.namedItem('species');
+    const consent = form.elements.namedItem('consent');
+    const draft: Omit<PlantingDraft, 'updatedAt'> = {
+      currentStep: step,
+      name: supporter instanceof HTMLInputElement ? supporter.value : '',
+      seedType: species instanceof RadioNodeList ? species.value : '',
+      consent: consent instanceof HTMLInputElement && consent.checked,
+      latitude: selectedPlantLocation?.latitude ?? null,
+      longitude: selectedPlantLocation?.longitude ?? null,
+      caption: shareCaptionPreview.textContent ?? createShareCaption(),
+      plantedTree,
+      proofUrl: proofUrlInput.value,
+      proofConsent: proofConsent.checked,
+      certificateDownloaded,
+      captionCopied,
+      certificatePhotoPosition,
+      certificatePhotoZoom,
+      certificatePhotoDataUrl,
+    };
+    if (savePlantingDraft(draft)) {
+      storageFailureNotified = false;
+    } else if (!storageFailureNotified) {
+      storageFailureNotified = true;
+      showToast('Không thể lưu tiến trình trồng cây trên thiết bị này.');
+    }
+  };
 
   const updateSharingProgress = (): void => {
     const steps = [
@@ -345,6 +406,7 @@ export const setupForestPlanting = (): void => {
     shareReadiness.textContent = certificateDownloaded && captionCopied
       ? '🎉 Bạn đã chuẩn bị xong để chia sẻ!'
       : 'Bạn đã chuẩn bị xong! Hãy nhận chứng nhận và sao chép caption để sẵn sàng chia sẻ.';
+    persistDraft();
   };
 
   const resetSharingProgress = (): void => {
@@ -354,6 +416,7 @@ export const setupForestPlanting = (): void => {
     certificatePhoto = null;
     certificatePhotoPosition = { x: 0.5, y: 0.5 };
     certificatePhotoZoom = 1;
+    certificatePhotoDataUrl = null;
     certificateDownloaded = false;
     captionCopied = false;
     downloadCertificate.disabled = false;
@@ -378,10 +441,11 @@ export const setupForestPlanting = (): void => {
     photo: HTMLImageElement | null = certificatePhoto,
     photoPosition: CertificatePhotoPosition = certificatePhotoPosition,
     photoZoom: number = certificatePhotoZoom,
+    preserveDownloadStatus = false,
   ): Promise<void> => {
     const generation = ++certificateGeneration;
     certificateTree = tree;
-    certificateDownloaded = false;
+    if (!preserveDownloadStatus) certificateDownloaded = false;
     downloadCertificate.disabled = true;
     certificateStatus.textContent = 'Đang chuẩn bị chứng nhận của bạn…';
     updateSharingProgress();
@@ -479,10 +543,12 @@ export const setupForestPlanting = (): void => {
   certificatePreview.addEventListener('pointerup', finishCertificatePhotoDrag);
   certificatePreview.addEventListener('pointercancel', finishCertificatePhotoDrag);
   certificatePreview.addEventListener('lostpointercapture', finishCertificatePhotoDrag);
+  certificatePreview.addEventListener('pointerup', () => persistDraft());
   downloadCertificate.disabled = false;
   updateSharingProgress();
 
   const openFacebookShare = (): void => {
+    persistDraft();
     window.open('https://www.facebook.com/', '_blank', 'noopener,noreferrer');
   };
 
@@ -498,12 +564,16 @@ export const setupForestPlanting = (): void => {
       && consent.checked
       && selectedPlantLocation);
   };
-  form.addEventListener('input', updatePlantSubmitState);
+  form.addEventListener('input', () => {
+    updatePlantSubmitState();
+    persistDraft();
+  });
   form.addEventListener('change', (event) => {
     if (event.target instanceof HTMLInputElement && event.target.name === 'species' && selectedPlantLocation) {
       setPlantingPreview(selectedPlantLocation, event.target.value);
     }
     updatePlantSubmitState();
+    persistDraft();
   });
 
   const refreshPlantingMap = async (): Promise<void> => {
@@ -519,6 +589,7 @@ export const setupForestPlanting = (): void => {
       const species = String(new FormData(form).get('species') ?? 'oak');
       setPlantingPreview(location, species);
       updatePlantSubmitState();
+      persistDraft();
     });
     if (!map) return;
     try {
@@ -539,6 +610,7 @@ export const setupForestPlanting = (): void => {
   };
 
   const setPlantStep = (step: PlantStep): void => {
+    currentStep = step;
     const order: PlantStep[] = ['PLANT', 'SHARE', 'VERIFY', 'COMPLETE'];
     document.querySelectorAll<HTMLElement>('[data-step-indicator]').forEach((indicator) => {
       const indicatorStep = indicator.dataset.stepIndicator as PlantStep;
@@ -549,6 +621,7 @@ export const setupForestPlanting = (): void => {
       const number = indicator.querySelector('span');
       if (number) number.textContent = index < currentIndex ? '✓' : String(index + 1);
     });
+    persistDraft(step);
   };
 
   const showCompleteStep = (): void => {
@@ -561,6 +634,7 @@ export const setupForestPlanting = (): void => {
   };
 
   const state: ForestState = { trees: [], target: TARGET_TREES };
+  const initialDraft = getPlantingDraft();
   const loadForest = async (): Promise<void> => {
     const progressLabel = document.querySelector<HTMLElement>('#progress-label');
     if (progressLabel) progressLabel.textContent = 'Đang tải bản đồ...';
@@ -575,10 +649,129 @@ export const setupForestPlanting = (): void => {
   };
   void loadForest();
 
+  const restoreDraft = async (draft: PlantingDraft): Promise<void> => {
+    draftActive = false;
+    resetSharingProgress();
+
+    const supporter = form.elements.namedItem('supporter');
+    const species = form.elements.namedItem('species');
+    const consent = form.elements.namedItem('consent');
+    if (supporter instanceof HTMLInputElement) supporter.value = draft.name;
+    if (species instanceof RadioNodeList) {
+      const savedSpecies = Array.from(species).find(
+        (input): input is HTMLInputElement =>
+          input instanceof HTMLInputElement && input.value === draft.seedType,
+      );
+      if (savedSpecies) savedSpecies.checked = true;
+    }
+    if (consent instanceof HTMLInputElement) consent.checked = draft.consent;
+
+    selectedPlantLocation = typeof draft.latitude === 'number' && typeof draft.longitude === 'number'
+      ? { latitude: draft.latitude, longitude: draft.longitude }
+      : null;
+    plantedTree = draft.plantedTree;
+    participantName = plantedTree?.name ?? draft.name;
+    certificatePhotoPosition = draft.certificatePhotoPosition;
+    certificatePhotoZoom = draft.certificatePhotoZoom;
+    certificatePhotoDataUrl = draft.certificatePhotoDataUrl;
+    certificateDownloaded = draft.certificateDownloaded;
+    captionCopied = draft.captionCopied;
+    proofUrlInput.value = draft.proofUrl;
+    proofConsent.checked = draft.proofConsent;
+    shareCaptionPreview.textContent = draft.caption || createShareCaption();
+    completeSupporter.textContent = participantName || 'bạn';
+    certificateStatus.textContent = certificateDownloaded
+      ? 'Chứng nhận đã sẵn sàng 💚 Hãy lưu ảnh để sử dụng khi chia sẻ lên Facebook.'
+      : 'Ảnh PNG tỷ lệ 4:5, phù hợp để đăng bài.';
+    captionStatus.textContent = captionCopied
+      ? 'Đã sao chép caption 💚 Bạn có thể dán vào bài viết Facebook.'
+      : 'Bạn có thể dán caption này cùng với chứng nhận.';
+    certificatePhotoStatus.textContent = certificatePhotoDataUrl
+      ? 'Ảnh chứng nhận đã được lưu và sẽ được khôi phục.'
+      : 'Chọn ảnh từ thiết bị để thay ảnh phong cảnh trên chứng nhận.';
+    if (plantedTree) {
+      if (plantedTree.status === 'PENDING') {
+        sessionStorage.setItem(CURRENT_TREE_KEY, plantedTree.id);
+        sessionStorage.setItem('nghe-rung-ke:last-tree-id', plantedTree.id);
+      } else {
+        sessionStorage.setItem('nghe-rung-ke:last-confirmed-tree-id', plantedTree.id);
+      }
+    }
+
+    currentStep = draft.currentStep;
+    draftActive = true;
+    formStep.hidden = draft.currentStep !== 'PLANT';
+    resultStep.hidden = draft.currentStep !== 'SHARE';
+    shareStep.hidden = draft.currentStep !== 'SHARE';
+    verifyStep.hidden = draft.currentStep !== 'VERIFY';
+    completeStep.hidden = draft.currentStep !== 'COMPLETE';
+    dialog.classList.toggle('plant-result-mode', draft.currentStep !== 'PLANT');
+    setPlantStep(draft.currentStep);
+    updatePlantSubmitState();
+    updateSharingProgress();
+    verifyError.textContent = '';
+    const formError = document.querySelector<HTMLElement>('#form-error');
+    if (formError) formError.textContent = '';
+    if (!dialog.open) dialog.showModal();
+
+    await refreshPlantingMap();
+    if (selectedPlantLocation) {
+      const selectedSpecies = species instanceof RadioNodeList ? species.value : 'oak';
+      setPlantingPreview(selectedPlantLocation, selectedSpecies);
+      locationHelp.textContent = '✓ Đã chọn vị trí';
+      locationHelp.classList.remove('is-error');
+    }
+    if (plantedTree && draft.currentStep !== 'PLANT') {
+      const resultTrees = new Map(state.trees.map((tree) => [tree.id, tree]));
+      resultTrees.set(plantedTree.id, toTreeRecord(plantedTree));
+      renderPlantingResultMap(Array.from(resultTrees.values()).map((tree) => ({
+        id: tree.id,
+        treeType: tree.species,
+        latitude: tree.latitude,
+        longitude: tree.longitude,
+        status: tree.status,
+      })), plantedTree.id);
+
+      try {
+        certificatePhoto = certificatePhotoDataUrl
+          ? await loadCertificatePhotoFromDataUrl(certificatePhotoDataUrl)
+          : null;
+        await prepareCertificate(
+          plantedTree,
+          certificatePhoto,
+          certificatePhotoPosition,
+          certificatePhotoZoom,
+          true,
+        );
+      } catch (error) {
+        console.error('Could not restore planting certificate:', error);
+        certificatePhoto = null;
+        certificatePhotoDataUrl = null;
+        certificateStatus.textContent = 'Không thể khôi phục chứng nhận. Vui lòng thử tải lại chứng nhận.';
+        updateSharingProgress();
+      }
+    }
+  };
+
   document.querySelectorAll<HTMLElement>('[data-open-plant]').forEach((button) => {
     button.addEventListener('click', () => {
       if (dialog.open) return;
+      const savedDraft = getPlantingDraft();
+      if (savedDraft) {
+        void restoreDraft(savedDraft);
+        return;
+      }
+      draftActive = false;
+      clearPlantingDraft();
       resetSharingProgress();
+      form.reset();
+      plantedTree = null;
+      selectedPlantLocation = null;
+      certificatePhotoDataUrl = null;
+      proofUrlInput.value = '';
+      proofConsent.checked = false;
+      sessionStorage.removeItem(CURRENT_TREE_KEY);
+      sessionStorage.removeItem('nghe-rung-ke:last-tree-id');
       dialog.classList.remove('plant-result-mode');
       formStep.hidden = false;
       resultStep.hidden = true;
@@ -593,25 +786,18 @@ export const setupForestPlanting = (): void => {
       setPlantStep('PLANT');
       document.querySelector<HTMLElement>('#form-error')!.textContent = '';
       verifyError.textContent = '';
-      proofUrlInput.value = '';
-      proofConsent.checked = false;
+      draftActive = true;
       dialog.showModal();
+      persistDraft('PLANT');
       void refreshPlantingMap();
     });
   });
 
-  const resetPlantLocation = (): void => {
-    selectedPlantLocation = null;
-    clearPlantingPreview();
-    locationHelp.textContent = 'Chạm vào một vị trí trên bản đồ để chọn nơi gieo mầm.';
-    locationHelp.classList.remove('is-error');
-    updatePlantSubmitState();
-  };
   document.querySelector('#close-dialog')?.addEventListener('click', () => {
-    resetPlantLocation();
+    persistDraft();
     dialog.close();
   });
-  dialog.addEventListener('close', resetPlantLocation);
+  dialog.addEventListener('close', () => persistDraft());
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close();
   });
@@ -637,20 +823,39 @@ export const setupForestPlanting = (): void => {
     plantSubmit.disabled = true;
     const originalSubmitText = plantSubmit.textContent;
     plantSubmit.textContent = 'Đang gieo mầm...';
-    let createdTree: TreeParticipant;
-    try {
-      createdTree = await createTree({ name: supporter, treeType: species, ...coordinates });
-    } catch (requestError) {
-      console.error('Supabase tree insert failed:', requestError);
-      if (error) error.textContent = requestError instanceof Error ? requestError.message : 'Không thể gieo mầm. Vui lòng thử lại.';
-      plantSubmit.disabled = false;
-      plantSubmit.textContent = originalSubmitText;
-      return;
+    persistDraft('PLANT');
+    let createdTree: PlantingDraftTree;
+    const existingTreeMatchesForm = plantedTree
+      && plantedTree.status === 'PENDING'
+      && plantedTree.name === supporter
+      && plantedTree.tree_type === species
+      && plantedTree.latitude === coordinates.latitude
+      && plantedTree.longitude === coordinates.longitude;
+    if (existingTreeMatchesForm && plantedTree) {
+      createdTree = plantedTree;
+    } else {
+      plantedTree = null;
+      persistDraft('PLANT');
+      try {
+        createdTree = await createTree({ name: supporter, treeType: species, ...coordinates });
+      } catch (requestError) {
+        console.error('Supabase tree insert failed:', requestError);
+        if (error) error.textContent = requestError instanceof Error ? requestError.message : 'Không thể gieo mầm. Vui lòng thử lại.';
+        plantSubmit.disabled = false;
+        plantSubmit.textContent = originalSubmitText;
+        return;
+      }
     }
+    plantedTree = createdTree;
+    sessionStorage.setItem(CURRENT_TREE_KEY, createdTree.id);
+    sessionStorage.setItem('nghe-rung-ke:last-tree-id', createdTree.id);
+    persistDraft('SHARE');
     const newTree = toTreeRecord(createdTree);
     participantName = supporter;
     completeSupporter.textContent = supporter;
-    state.trees.push(newTree);
+    const existingTreeIndex = state.trees.findIndex((tree) => tree.id === newTree.id);
+    if (existingTreeIndex >= 0) state.trees[existingTreeIndex] = newTree;
+    else state.trees.push(newTree);
     renderForest(state);
     plantSubmit.disabled = false;
     plantSubmit.textContent = originalSubmitText;
@@ -678,11 +883,8 @@ export const setupForestPlanting = (): void => {
         status: tree.status,
       })),
     ], createdTree.id);
-    form.reset();
     updatePlantSubmitState();
     sessionStorage.setItem('nghe-rung-ke:last-supporter', supporter);
-    sessionStorage.setItem(CURRENT_TREE_KEY, createdTree.id);
-    sessionStorage.setItem('nghe-rung-ke:last-tree-id', createdTree.id);
     showToast(`🌱 Mầm xanh của ${supporter} đã được gieo!`);
   });
 
@@ -712,6 +914,7 @@ export const setupForestPlanting = (): void => {
     try {
       const photo = await loadCertificatePhoto(file);
       if (generation !== certificateGeneration) return;
+      certificatePhotoDataUrl = persistableCertificatePhoto(photo);
       await prepareCertificate(tree, photo, { x: 0.5, y: 0.5 }, 1);
       certificatePhotoStatus.textContent = 'Ảnh chứng nhận đã được cập nhật.';
     } catch (error) {
@@ -726,6 +929,7 @@ export const setupForestPlanting = (): void => {
     if (!certificateTree) return;
     certificatePhotoStatus.textContent = 'Đang khôi phục ảnh mặc định…';
     try {
+      certificatePhotoDataUrl = null;
       await prepareCertificate(certificateTree, null, { x: 0.5, y: 0.5 }, 1);
       certificatePhotoStatus.textContent = 'Đã khôi phục ảnh mặc định trên chứng nhận.';
     } catch (error) {
@@ -748,7 +952,9 @@ export const setupForestPlanting = (): void => {
       verifyError.textContent = 'Vui lòng dán một đường link hợp lệ.';
       return;
     }
-    const treeId = sessionStorage.getItem(CURRENT_TREE_KEY) ?? sessionStorage.getItem('nghe-rung-ke:last-tree-id');
+    const treeId = plantedTree?.id
+      ?? sessionStorage.getItem(CURRENT_TREE_KEY)
+      ?? sessionStorage.getItem('nghe-rung-ke:last-tree-id');
     if (!treeId) {
       verifyError.textContent = 'Không tìm thấy mầm cây đang chờ xác nhận. Vui lòng gieo lại cây.';
       return;
@@ -766,6 +972,7 @@ export const setupForestPlanting = (): void => {
       confirmPlant.textContent = originalConfirmText;
       return;
     }
+    plantedTree = confirmedTree;
     const existingIndex = state.trees.findIndex((tree) => tree.id === treeId);
     if (existingIndex >= 0) state.trees[existingIndex] = toTreeRecord(confirmedTree);
     else state.trees.push(toTreeRecord(confirmedTree));
@@ -840,6 +1047,10 @@ export const setupForestPlanting = (): void => {
     dialog.scrollTop = 0;
   });
   viewForestMap.addEventListener('click', () => {
+    draftActive = false;
+    clearPlantingDraft();
+    sessionStorage.removeItem(CURRENT_TREE_KEY);
+    sessionStorage.removeItem('nghe-rung-ke:last-tree-id');
     dialog.close();
     document.querySelector('#forest-map-section')?.scrollIntoView({ behavior: 'smooth' });
   });
@@ -861,7 +1072,6 @@ export const setupForestPlanting = (): void => {
     shareStep.hidden = false;
     setPlantStep('SHARE');
   });
-
   backToVerify.addEventListener('click', () => {
     completeStep.hidden = true;
     formStep.hidden = true;
@@ -870,4 +1080,17 @@ export const setupForestPlanting = (): void => {
     verifyStep.hidden = false;
     setPlantStep('VERIFY');
   });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') persistDraft();
+  });
+  window.addEventListener('pagehide', () => persistDraft());
+  window.addEventListener('beforeunload', () => persistDraft());
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return;
+    const draft = getPlantingDraft();
+    if (draft) void restoreDraft(draft);
+  });
+
+  if (initialDraft) void restoreDraft(initialDraft);
 };
