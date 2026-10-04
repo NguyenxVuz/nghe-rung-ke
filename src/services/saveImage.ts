@@ -1,5 +1,10 @@
 export type ImageSaveMethod = 'shared' | 'downloaded';
 
+const isMobileDevice = (): boolean => (
+  /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+);
+
 export const saveImage = async (
   blob: Blob,
   filename: string,
@@ -7,7 +12,8 @@ export const saveImage = async (
 ): Promise<ImageSaveMethod> => {
   const file = new File([blob], filename, { type: blob.type || 'image/png' });
   if (
-    typeof navigator.share === 'function'
+    isMobileDevice()
+    && typeof navigator.share === 'function'
     && navigator.canShare?.({ files: [file] })
   ) {
     await navigator.share({ files: [file], title });
