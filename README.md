@@ -44,7 +44,8 @@ Website sẽ có địa chỉ:
 - Navbar ba nhóm có dropdown: Nghe Rừng Kể, Về Dự Án, Về Chúng Tôi;
   nút Cùng Hành Động luôn dẫn đến trang trồng cây.
 - Thư cảm ơn tự động nhận tên sau khi trồng cây, cho phép đổi tên, thêm ảnh,
-  tải PNG hoặc chia sẻ bằng Web Share API.
+  tải PNG hoặc chia sẻ bằng Web Share API. Trên điện thoại, chọn “Lưu hình ảnh”
+  trong bảng chia sẻ để lưu ảnh vào thiết bị.
 - Giao diện responsive theo concept “From Awareness to Action”.
 - Dark/Light mode, menu mobile, animation theo thao tác cuộn.
 - Bản đồ cây ảo tương tác, kiểm tra link minh chứng và lưu dữ liệu bằng `localStorage`.

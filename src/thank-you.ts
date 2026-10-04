@@ -1,6 +1,7 @@
 import './style.css';
 import templateUrl from './assets/thank-you-template.png';
 import brushMaskUrl from './assets/thank-you-brush-mask.png';
+import { saveImage } from './services/saveImage';
 
 interface CardState {
   name: string;
@@ -169,14 +170,20 @@ resetPhotoButton.addEventListener('click', () => {
 });
 
 downloadButton.addEventListener('click', async () => {
-  const blob = await cardBlob();
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `thu-cam-on-${safeFileName(state.name)}.png`;
-  link.click();
-  URL.revokeObjectURL(url);
-  showToast('Thiệp cảm ơn đã được tải xuống.');
+  try {
+    const blob = await cardBlob();
+    const method = await saveImage(blob, `thu-cam-on-${safeFileName(state.name)}.png`, 'Thiệp cảm ơn Nghe Rừng Kể');
+    showToast(method === 'shared'
+      ? 'Hãy chọn “Lưu hình ảnh” trong bảng chia sẻ để lưu thiệp.'
+      : 'Đã gửi yêu cầu tải thiệp.');
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      showToast('Đã đóng bảng chia sẻ. Thiệp chưa được lưu.');
+      return;
+    }
+    console.error('Could not save thank-you card:', error);
+    showToast('Không thể lưu thiệp. Vui lòng thử lại.');
+  }
 });
 
 shareButton.addEventListener('click', async () => {

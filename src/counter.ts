@@ -18,6 +18,7 @@ import {
   setPlantingPreview,
   type PlantLocation,
 } from './map/plantingMap';
+import { saveImage } from './services/saveImage';
 
 export interface TreeRecord {
   id: string;
@@ -401,7 +402,7 @@ export const setupForestPlanting = (): void => {
     certificateCheck.textContent = certificateDownloaded ? '✓' : '';
     captionCheck.textContent = captionCopied ? '✓' : '';
     facebookCheck.textContent = certificateDownloaded && captionCopied ? '✓' : '';
-    downloadCertificate.textContent = certificateDownloaded ? '✓ Đã nhận chứng nhận' : '↓ Tải chứng nhận';
+    downloadCertificate.textContent = certificateDownloaded ? '↓ Lưu / tải lại chứng nhận' : '↓ Lưu chứng nhận';
     copyCaption.textContent = captionCopied ? '✓ Đã sao chép caption' : '⧉ Sao chép caption';
     facebookSharingCard.classList.toggle('is-ready', certificateDownloaded && captionCopied);
     shareReadiness.textContent = certificateDownloaded && captionCopied
@@ -682,7 +683,7 @@ export const setupForestPlanting = (): void => {
     shareCaptionPreview.textContent = draft.caption || createShareCaption();
     completeSupporter.textContent = participantName || 'bạn';
     certificateStatus.textContent = certificateDownloaded
-      ? 'Chứng nhận đã sẵn sàng 💚 Hãy lưu ảnh để sử dụng khi chia sẻ lên Facebook.'
+      ? 'Bạn đã mở chức năng lưu chứng nhận. Nếu chưa thấy ảnh, hãy nhấn nút để lưu lại.'
       : 'Ảnh PNG tỷ lệ 4:5, phù hợp để đăng bài.';
     captionStatus.textContent = captionCopied
       ? 'Đã sao chép caption 💚 Bạn có thể dán vào bài viết Facebook.'
@@ -1001,27 +1002,32 @@ export const setupForestPlanting = (): void => {
           else reject(new Error('Không thể tạo ảnh PNG.'));
         }, 'image/png');
       });
-      const objectUrl = URL.createObjectURL(certificateBlob);
-      const downloadLink = document.createElement('a');
       const filename = participantName.normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '') || 'nguoi-ban-cua-rung';
-      downloadLink.href = objectUrl;
-      downloadLink.download = `chung-nhan-nghe-rung-ke-${filename}.png`;
-      document.body.append(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
-      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      const saveMethod = await saveImage(
+        certificateBlob,
+        `chung-nhan-nghe-rung-ke-${filename}.png`,
+        'Chứng nhận Nghe Rừng Kể',
+      );
       certificateDownloaded = true;
-      certificateStatus.textContent = 'Chứng nhận đã sẵn sàng 💚 Hãy lưu ảnh để sử dụng khi chia sẻ lên Facebook.';
+      certificateStatus.textContent = saveMethod === 'shared'
+        ? 'Bảng chia sẻ đã đóng. Nếu bạn chọn “Lưu hình ảnh”, hãy kiểm tra ứng dụng Ảnh; nếu chưa lưu, nhấn nút để mở lại.'
+        : 'Đã gửi yêu cầu tải ảnh. Nếu chưa thấy ảnh, hãy nhấn “Lưu / tải lại chứng nhận” hoặc kiểm tra thư mục Tải về.';
       updateSharingProgress();
-      showToast('Chứng nhận đã sẵn sàng 💚');
+      showToast(saveMethod === 'shared'
+        ? 'Hãy chọn “Lưu hình ảnh” trong bảng chia sẻ để lưu chứng nhận.'
+        : 'Đã gửi yêu cầu tải chứng nhận.');
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        certificateStatus.textContent = 'Bạn đã đóng bảng chia sẻ. Chứng nhận chưa được lưu; hãy nhấn nút để thử lại.';
+        return;
+      }
       console.error('Could not download planting certificate:', error);
-      certificateStatus.textContent = 'Không thể tải chứng nhận. Vui lòng thử lại.';
-      showToast('Không thể tải chứng nhận. Vui lòng thử lại.');
+      certificateStatus.textContent = 'Không thể lưu chứng nhận. Vui lòng thử lại hoặc dùng trình duyệt khác.';
+      showToast('Không thể lưu chứng nhận. Vui lòng thử lại.');
     }
   });
   copyCaption.addEventListener('click', async () => {
