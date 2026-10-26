@@ -1,4 +1,5 @@
 import './style.css';
+import './site-config';
 
 type Theme = 'light' | 'dark';
 
@@ -36,19 +37,112 @@ const setupNavigation = (): void => {
   if (!header || !nav || !menuButton) return;
 
   const currentPage = document.body.dataset.page;
-  document.querySelectorAll<HTMLAnchorElement>('.nav-link').forEach((link) => {
+  document.querySelectorAll<HTMLElement>('.nav-link').forEach((link) => {
     link.classList.toggle('active', link.dataset.page === currentPage);
   });
+  const menuItems = Array.from(nav.querySelectorAll<HTMLElement>('.nav-item'));
+  const navToggles = Array.from(nav.querySelectorAll<HTMLButtonElement>('.nav-toggle'));
+  const closeItem = (item: HTMLElement): void => {
+    item.classList.remove('open');
+    item.querySelector<HTMLButtonElement>('.nav-toggle')?.setAttribute('aria-expanded', 'false');
+  };
+  const closeDropdowns = (): void => menuItems.forEach(closeItem);
+  const isMobile = (): boolean => matchMedia('(max-width: 1050px)').matches;
+  const closeMobileMenu = (restoreFocus = false): void => {
+    nav.classList.remove('open');
+    closeDropdowns();
+    document.body.classList.remove('menu-open');
+    menuButton.setAttribute('aria-expanded', 'false');
+    menuButton.setAttribute('aria-label', 'Mở menu');
+    if (restoreFocus) menuButton.focus();
+  };
+
+  navToggles.forEach((toggle) => {
+    const item = toggle.closest<HTMLElement>('.nav-item');
+    if (!item) return;
+    toggle.addEventListener('click', () => {
+      const shouldOpen = !item.classList.contains('open');
+      closeDropdowns();
+      item.classList.toggle('open', shouldOpen);
+      toggle.setAttribute('aria-expanded', String(shouldOpen));
+    });
+    item.addEventListener('pointerenter', () => {
+      if (isMobile()) return;
+      closeDropdowns();
+      item.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+    });
+    item.addEventListener('pointerleave', () => {
+      if (isMobile() || item.contains(document.activeElement)) return;
+      closeItem(item);
+    });
+    item.addEventListener('focusin', () => {
+      if (isMobile()) return;
+      closeDropdowns();
+      item.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+    });
+    item.addEventListener('focusout', (event) => {
+      if (isMobile() || item.contains(event.relatedTarget as Node | null)) return;
+      closeItem(item);
+    });
+  });
+
   document.querySelectorAll<HTMLAnchorElement>('#main-nav a').forEach((link) => {
     link.addEventListener('click', () => {
-      nav.classList.remove('open');
-      menuButton.setAttribute('aria-expanded', 'false');
+      if (isMobile()) closeMobileMenu();
+      else closeDropdowns();
     });
   });
 
   menuButton.addEventListener('click', () => {
     const isOpen = nav.classList.toggle('open');
     menuButton.setAttribute('aria-expanded', String(isOpen));
+    menuButton.setAttribute('aria-label', isOpen ? 'Đóng menu' : 'Mở menu');
+    document.body.classList.toggle('menu-open', isOpen);
+    if (isOpen) navToggles[0]?.focus();
+    else closeDropdowns();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      if (isMobile() && nav.classList.contains('open')) {
+        closeMobileMenu(true);
+        return;
+      }
+      const openItem = menuItems.find((item) => item.classList.contains('open'));
+      if (openItem) {
+        const toggle = openItem.querySelector<HTMLButtonElement>('.nav-toggle');
+        closeItem(openItem);
+        toggle?.focus();
+      }
+      return;
+    }
+
+    if (event.key !== 'Tab' || !isMobile() || !nav.classList.contains('open')) return;
+    const focusable = Array.from(header.querySelectorAll<HTMLElement>(
+      '#main-nav.open a[href], #main-nav.open button:not(:disabled), #menu-toggle, .header-actions a[href], .header-actions button:not(:disabled)',
+    )).filter((element) => element.getClientRects().length > 0);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (isMobile() && nav.classList.contains('open') && !header.contains(event.target as Node)) {
+      closeMobileMenu();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (!isMobile()) closeMobileMenu();
   });
 
   const updateHeader = (): void => {
@@ -69,11 +163,14 @@ const setupReveal = (): void => {
       entry.target.classList.add('revealed');
       observer.unobserve(entry.target);
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.01, rootMargin: '0px 0px 15% 0px' });
 
-  // Hide elements only after the observer is ready. A broken script still leaves content visible.
   document.documentElement.classList.add('reveal-ready');
   items.forEach((item) => observer.observe(item));
+  window.setTimeout(() => {
+    items.forEach((item) => item.classList.add('revealed'));
+    observer.disconnect();
+  }, 1200);
 };
 
 const setupTimeline = (): void => {

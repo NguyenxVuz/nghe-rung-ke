@@ -16,7 +16,7 @@ const statusLevel = (status: string): string => {
 
 const cardMarkup = (number: string, name: string, image: string, status: string, description: string): string => `
   <button class="species-card" type="button" data-species-card data-number="${escapeHtml(number)}" data-name="${escapeHtml(name)}" data-image="${escapeHtml(image)}" data-status="${escapeHtml(status)}" data-description="${escapeHtml(description)}">
-    <img src="${escapeHtml(image)}" alt="Ảnh minh họa: ${escapeHtml(name)}" loading="lazy" />
+    <img src="${escapeHtml(image)}" alt="Ảnh minh họa: ${escapeHtml(name)}" width="600" height="400" loading="lazy" decoding="async" />
     <span class="species-card-number">${escapeHtml(number)}</span>
     <strong>${escapeHtml(name)}</strong>
     <span class="species-status-badge species-status-${statusLevel(status)}"><b>Tình trạng</b>: ${escapeHtml(status)}</span>
@@ -105,13 +105,17 @@ const setupMagazineReveal = (): void => {
       entry.target.classList.add('magazine-revealed');
       observer.unobserve(entry.target);
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.01, rootMargin: '0px 0px 15% 0px' });
 
   items.forEach((item, index) => {
     item.style.setProperty('--reveal-delay', `${(index % 4) * 70}ms`);
     item.classList.add('magazine-reveal');
     observer.observe(item);
   });
+  window.setTimeout(() => {
+    items.forEach((item) => item.classList.add('magazine-revealed'));
+    observer.disconnect();
+  }, 1500);
 };
 
 renderSpecies();

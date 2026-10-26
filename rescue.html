@@ -6,7 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="TRUNG TÂM CỨU HỘ, BẢO TỒN VÀ PHÁT TRIỂN SINH VẬT" />
   <meta name="theme-color" content="#123b2a" />
-  <link rel="icon" type="image/png" href="./favicon.png" />
+  <link rel="canonical" href="https://nghe-rung-ke.site/rescue.html" />
+  <meta property="og:title" content="TRUNG TÂM CỨU HỘ, BẢO TỒN VÀ PHÁT TRIỂN SINH VẬT" />
+  <meta property="og:description" content="TRUNG TÂM CỨU HỘ, BẢO TỒN VÀ PHÁT TRIỂN SINH VẬT" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://nghe-rung-ke.site/rescue.html" />
+  <meta property="og:image" content="https://nghe-rung-ke.site/assets/og/og-default.jpg" />
+  <meta property="og:locale" content="vi_VN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -16,27 +25,28 @@
 </head>
 
 <body class="rescue-page" data-page="journey">
+  <a class="skip-link" href="#main">Bỏ qua để tới nội dung</a>
   <header class="site-header">
     <a class="brand" href="./index.html"><span class="brand-mark">🍃</span><span><b>NGHE RỪNG KỂ</b><small>From
           Awareness to Action</small></span></a>
     <nav id="main-nav" aria-label="Điều hướng chính">
-      <div class="nav-item"><a class="nav-link" data-page="home" href="./index.html">Nghe Rừng Kể <span class="chevron">⌄</span></a>
-        <div class="nav-dropdown"><a href="./story.html#forest-status"><b>Thực trạng của rừng</b><small>Hiểu về rừng</small></a><a href="./join.html#forest-map"><b>Bản đồ Bù Gia Mập</b><small>Theo dõi cây ảo đã trồng</small></a><a href="./join.html#how-to-join"><b>Hoạt động trồng cây ảo</b><small>Hướng dẫn tham gia</small></a></div>
+      <div class="nav-item"><button class="nav-link nav-toggle" data-page="home" type="button" aria-expanded="false" aria-controls="home-menu">Nghe Rừng Kể <span class="chevron">⌄</span></button>
+        <div class="nav-dropdown" id="home-menu"><a href="./story.html#forest-status"><b>Thực trạng của rừng</b><small>Hiểu về rừng</small></a><a href="./join.html#forest-map"><b>Bản đồ Bù Gia Mập</b><small>Theo dõi cây ảo đã trồng</small></a><a href="./join.html#how-to-join"><b>Hoạt động trồng cây ảo</b><small>Hướng dẫn tham gia</small></a></div>
       </div>
-      <div class="nav-item"><a class="nav-link" data-page="about" href="./about.html">Về Dự Án <span class="chevron">⌄</span></a>
-        <div class="nav-dropdown"><a href="./about.html#overview"><b>Giới thiệu dự án</b><small>Mission, vision và mục tiêu</small></a><a href="./story.html#journey"><b>Hành trình thực hiện</b><small>Timeline dự án</small></a><a href="./about.html#communication"><b>Hệ sinh thái truyền thông</b><small>TikTok, website và offline</small></a></div>
+      <div class="nav-item"><button class="nav-link nav-toggle" data-page="about" type="button" aria-expanded="false" aria-controls="about-menu">Về Dự Án <span class="chevron">⌄</span></button>
+        <div class="nav-dropdown" id="about-menu"><a href="./about.html#overview"><b>Giới thiệu dự án</b><small>Mission, vision và mục tiêu</small></a><a href="./story.html#journey"><b>Hành trình thực hiện</b><small>Timeline dự án</small></a><a href="./about.html#communication"><b>Hệ sinh thái truyền thông</b><small>TikTok, website và offline</small></a></div>
       </div>
-      <div class="nav-item"><a class="nav-link" data-page="journey" href="./rescue.html">Hành trình về Đại ngàn <span class="chevron">⌄</span></a>
-        <div class="nav-dropdown"><a href="./rescue.html"><b>Trung tâm cứu hộ, bảo tồn và phát triển sinh vật</b></a><a href="./volunteer.html"><b>Chương trình tình nguyện viên tại Vườn quốc gia Bù Gia Mập</b></a><a href="./trip.html"><b>Dự án Nghe Rừng Kể tại Vườn Quốc Gia Bù Gia Mập</b></a></div>
+      <div class="nav-item"><button class="nav-link nav-toggle" data-page="journey" type="button" aria-expanded="false" aria-controls="journey-menu">Hành trình về Đại ngàn <span class="chevron">⌄</span></button>
+        <div class="nav-dropdown" id="journey-menu"><a href="./rescue.html"><b>Trung tâm cứu hộ, bảo tồn và phát triển sinh vật</b></a><a href="./volunteer.html"><b>Chương trình tình nguyện viên tại Vườn quốc gia Bù Gia Mập</b></a><a href="./trip.html"><b>Dự án Nghe Rừng Kể tại Vườn Quốc Gia Bù Gia Mập</b></a></div>
       </div>
-      <div class="nav-item"><a class="nav-link" data-page="team" href="./team.html">Về Chúng Tôi <span class="chevron">⌄</span></a>
-        <div class="nav-dropdown nav-dropdown-right"><a href="./team.html#team"><b>Nhóm thực hiện</b><small>8 thành viên</small></a><a href="./team.html#contact"><b>Thông tin liên hệ</b><small>Kết nối với dự án</small></a></div>
+      <div class="nav-item"><button class="nav-link nav-toggle" data-page="team" type="button" aria-expanded="false" aria-controls="team-menu">Về Chúng Tôi <span class="chevron">⌄</span></button>
+        <div class="nav-dropdown nav-dropdown-right" id="team-menu"><a href="./team.html#team"><b>Nhóm thực hiện</b><small>8 thành viên</small></a><a href="./team.html#contact"><b>Thông tin liên hệ</b><small>Kết nối với dự án</small></a></div>
       </div>
     </nav>
     <div class="header-actions"><button class="icon-button theme-toggle" id="theme-toggle" type="button"><span class="sun">☀</span><span class="moon">☾</span></button><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Mở menu" aria-controls="main-nav" aria-expanded="false"><span></span><span></span><span></span></button><a class="button button-small" href="./join.html">Cùng hành động</a></div>
   </header>
 
-  <main>
+  <main id="main" tabindex="-1">
     <section class="page-hero rescue-hero">
       <div data-reveal>
         <h1>TRUNG TÂM CỨU HỘ, BẢO TỒN VÀ PHÁT TRIỂN SINH VẬT</h1>
@@ -57,7 +67,7 @@
       <p><strong>Nạn săn bắt và buôn bán trái phép:</strong> Đằng sau những chuyến xe phi pháp và những chiếc bẫy thép là chuỗi ngày giam cầm khắc nghiệt. Sự bạo lực ấy không chỉ để lại những vết sẹo thương tật nặng nề trên thân thể, mà còn khoét sâu vào tâm lý, khiến các em luôn sống trong hoảng loạn, thu mình và mất hoàn toàn niềm tin vào không gian xung quanh.</p>
 
       <article class="rescue-story-card">
-        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa Bí Đỏ tại Trung tâm Cứu hộ" loading="lazy" />
+        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa Bí Đỏ tại Trung tâm Cứu hộ" width="800" height="600" loading="lazy" />
         <div><h3>Bí đỏ - Nạn nhân của những chiếc bẫy vô tình và vết thương chưa thể nguôi ngoai.</h3>
           <p>Bí Đỏ may mắn hơn nhiều cá thể khác khi thân thể còn nguyên vẹn sau ngày được giải cứu khỏi săn trộm. Nhưng ít ai biết, điều tàn khốc nhất em phải mang theo là chuỗi ngày bị giam cầm trong chiếc lồng chật hẹp, chịu đánh đập và bất lực chứng kiến người thân yêu nhất của mình mất đi.</p>
           <p>Cú sốc quá nặng nề đẩy Bí Đỏ vào cơn trầm cảm sâu sắc. Những ngày đầu về trạm cứu hộ, em không chịu ăn uống, chỉ ngồi bó gối với ánh mắt nhìn xa xăm đầy ám ảnh.</p>
@@ -67,7 +77,7 @@
       </article>
 
       <article class="rescue-story-card reverse">
-        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa hai bạn khỉ kế bên nhà của Bí đỏ" loading="lazy" />
+        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa hai bạn khỉ kế bên nhà của Bí đỏ" width="800" height="600" loading="lazy" />
         <div><h3>Hai bạn khỉ kế bên nhà của Bí đỏ - những nhân chứng sống cho sự tàn độc của nạn săn bắt trộm. Những chiếc bẫy kẹp kim loại vô tình nơi rừng sâu đã cướp đi những phần chi lành lặn, để lại những cơ thể khuyết thiếu và nỗi đau đeo đẳng suốt đời.</h3>
           <p>Em mất đi một cánh tay, em khuyết đi một bước chân. Những chiếc bẫy kẹp kim loại tàn nhẫn nơi rừng sâu đã cướp đi phần cơ thể lành lặn, biến những đứa con vốn thuộc về tán cây cao thành những sinh linh yếu thế. Trong thế giới hoang dã khắc nghiệt, mất đi sự nhanh nhẹn đồng nghĩa với việc trở thành kẻ yếu thế, mất khả năng tự vệ và không còn cơ hội theo kịp bước chân của bầy đàn. Với các bạn, cánh cửa trở về với tán rừng tự nhiên gần như đã vĩnh viễn khép lại.</p>
           <p>Trạm cứu hộ giờ đây là ngôi nhà duy nhất mà các bạn có thể nương tựa. Dẫu không thể trả lại cho các bạn một cơ thể nguyên vẹn hay vòm trời đại ngàn tự do, tình yêu thương và sự chăm sóc tận tụy của các cán bộ nơi đây sẽ là liều thuốc chữa lành, chở che cho các bạn có được một cuộc đời bình yên và hạnh phúc quãng đời về sau.</p>
@@ -76,13 +86,13 @@
 
       <p><strong>Hệ lụy xót xa từ trào lưu nuôi thú cưng:</strong> Bị tách khỏi vòng tay thú mẹ từ thuở lọt lòng để phục vụ thú vui nuôi nhốt, nhiều bạn lớn lên giữa bốn bức tường chật hẹp và sự phụ thuộc hoàn toàn vào con người. Khi bản năng hoang dã - từ kỹ năng săn mồi, tìm kiếm nguồn nước, leo trèo đến phản xạ tự vệ - bị mài mòn theo năm tháng, các em rơi vào tình cảnh bất lực: không thể tự sinh tồn ngoài tự nhiên nếu không có sự nâng đỡ kịp thời.</p>
       <article class="rescue-story-card">
-        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa Rù Rì tại Trung tâm Cứu hộ" loading="lazy" />
+        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa Rù Rì tại Trung tâm Cứu hộ" width="800" height="600" loading="lazy" />
         <div><h3>Rù Rì - Vốn là loài chim săn mồi kiêu hãnh thống trị vòm trời tự do, Rù Rì lại bị tước đoạt khoảng không rộng lớn chỉ để thỏa mãn thú chơi thú cưng xa xỉ và mong muốn phô trương quyền uy vị kỷ của con người.</h3>
           <p>Đến với trạm cứu hộ, Rù Rì phải bắt đầu lại từ con số không: học cách mở rộng đôi cánh, học lại bản năng tự săn mồi và quan trọng nhất là từng bước gỡ bỏ nỗi sợ hãi con người đã hằn sâu trong tâm trí.</p>
         </div>
       </article>
       <article class="rescue-story-card reverse">
-        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa Rái cá tại Trung tâm Cứu hộ" loading="lazy" />
+        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa Rái cá tại Trung tâm Cứu hộ" width="800" height="600" loading="lazy" />
         <div><h3>Rái cá</h3>
           <p>Chỉ vì vẻ ngoài đáng yêu và những video triệu view trên mạng xã hội, rái cá từng trở thành nạn nhân của trào lưu nuôi thú cưng độc lạ. Người ta mang các em về nuôi trong những căn phòng tiện nghi, nhưng lại không có đủ thời gian và sự hiểu biết để tôn trọng thế giới tự nhiên của chúng.</p>
           <p>Bị ép ăn những món ăn gia vị của con người, các cơ quan nội tạng vốn nhạy cảm như gan, thận của các em dần suy giảm chức năng nghiêm trọng. Đau đớn hơn, việc nuôi nhốt khô khan đã tước đoạt đi vương quốc nước của rái cá - biến một loài thủy sinh bơi lội điêu luyện trở nên sợ nước, vụng về và phụ thuộc hoàn toàn vào những bữa ăn nhân tạo.</p>
@@ -90,7 +100,7 @@
         </div>
       </article>
       <article class="rescue-story-card">
-        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa chim Niệc mỏ vằn tại Trung tâm Cứu hộ" loading="lazy" />
+        <img src="/assets/species-placeholder.svg" alt="Ảnh minh họa chim Niệc mỏ vằn tại Trung tâm Cứu hộ" width="800" height="600" loading="lazy" />
         <div><h3>Chú chim Niệc - hay còn gọi là Niệc mỏ vằn</h3>
           <p>Sở hữu chiếc mỏ vằn độc bản cùng hình dáng kỳ vĩ, Niệc mỏ vằn là một trong những biểu tượng sinh động của rừng già. Thế nhưng, chính nét đẹp độc lạ này lại biến các em thành mục tiêu săn lùng, bị biến thành món "thú cưng quý tộc" để thỏa mãn thói khoe khoang quyền uy và đẳng cấp của con người.</p>
           <p>Trong tự nhiên, chim Niệc là loài chung thủy và đóng vai trò vô cùng quan trọng trong việc phát tán hạt giống cho rừng sâu. Bị nhốt sau khung sắt hẹp hòi, chiếc mỏ lớn vốn để vượt qua giông gió và tìm kiếm quả rừng nay trở nên thừa thãi, còn bản tính hoang dã kiêu hãnh bị dập tắt hoàn toàn.</p>
@@ -135,7 +145,7 @@
     <div><small>LIÊN HỆ</small><a href="mailto:Ngherungke2026@gmail.com">Ngherungke2026@gmail.com</a><a href="tel:0907414546">SĐT: 0907414546</a></div>
     <p class="copyright">© 2026 Nghe Rừng Kể.</p>
   </footer>
-  <dialog id="species-dialog" aria-labelledby="species-dialog-title"><button class="dialog-close" type="button" aria-label="Đóng">×</button><img id="species-dialog-image" src="/assets/species-placeholder.svg" alt="" /><p id="species-dialog-number"></p><h2 id="species-dialog-title"></h2><p><strong>Tình trạng</strong>: <span id="species-dialog-status"></span></p><p><strong>Đặc điểm nhận diện</strong>: <span id="species-dialog-description"></span></p></dialog>
+  <dialog id="species-dialog" aria-labelledby="species-dialog-title"><button class="dialog-close" type="button" aria-label="Đóng">×</button><img id="species-dialog-image" src="/assets/species-placeholder.svg" alt="" width="800" height="600" loading="lazy" /><p id="species-dialog-number"></p><h2 id="species-dialog-title"></h2><p><strong>Tình trạng</strong>: <span id="species-dialog-status"></span></p><p><strong>Đặc điểm nhận diện</strong>: <span id="species-dialog-description"></span></p></dialog>
   <script type="module" src="/src/main.ts"></script>
   <script type="module" src="/src/new-pages.ts"></script>
 </body>
