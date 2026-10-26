@@ -12,6 +12,8 @@ export default defineConfig({
         join: resolve(__dirname, 'join.html'),
         team: resolve(__dirname, 'team.html'),
         thankYou: resolve(__dirname, 'thank-you.html'),
+        rescue: resolve(__dirname, 'rescue.html'),
+        volunteer: resolve(__dirname, 'volunteer.html'),
       },
     },
   },

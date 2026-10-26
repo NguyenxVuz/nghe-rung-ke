@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 680" fill="none">
+  <defs>
+    <linearGradient id="field" x1="480" y1="0" x2="480" y2="680" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e4eadb"/>
+      <stop offset=".58" stop-color="#d2dfce"/>
+      <stop offset="1" stop-color="#a9c29f"/>
+    </linearGradient>
+    <linearGradient id="ridge" x1="480" y1="240" x2="480" y2="650" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#728e72" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#55765d" stop-opacity=".08"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#field)" d="M0 0h960v680H0z"/>
+  <circle cx="768" cy="147" r="48" fill="#D6AD52" fill-opacity=".5"/>
+  <path fill="url(#ridge)" d="m0 438 150-111 99 82 126-174 98 136 136-211 127 164 94-99 130 147v308H0z"/>
+  <path fill="#62856A" fill-opacity=".45" d="m0 501 164-113 105 98 131-122 113 105 145-145 105 126 110-87 87 88v229H0z"/>
+  <g fill="#315E45" fill-opacity=".42">
+    <path d="M108 566c6-90 25-149 57-177 29 42 42 102 38 177h-95Z"/>
+    <path d="M762 568c5-105 28-171 68-198 36 47 52 114 47 198h-115Z"/>
+    <path d="M832 566c4-73 20-121 46-143 24 35 35 83 32 143h-78Z"/>
+  </g>
+  <g stroke="#315E45" stroke-opacity=".55" stroke-width="3" stroke-linecap="round">
+    <path d="M485 471c-53-37-62-81-26-132 52 32 62 75 26 132Z"/>
+    <path d="M485 470c50-44 97-42 140 6-46 43-93 41-140-6Z"/>
+    <path d="M484 468c-20 50-59 67-119 51 17-55 57-72 119-51Z"/>
+    <path d="M485 470c13-70 51-104 115-102-6 65-44 99-115 102Z"/>
+    <path d="M480 476c-3 46-3 92 0 138"/>
+  </g>
+  <path d="M0 620c162-33 322-31 480 6 151 36 311 37 480 2v52H0v-60Z" fill="#315E45" fill-opacity=".12"/>
+</svg>
