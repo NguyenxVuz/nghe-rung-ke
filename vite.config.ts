@@ -14,6 +14,7 @@ export default defineConfig({
         thankYou: resolve(__dirname, 'thank-you.html'),
         rescue: resolve(__dirname, 'rescue.html'),
         volunteer: resolve(__dirname, 'volunteer.html'),
+        trip: resolve(__dirname, 'trip.html'),
       },
     },
   },
