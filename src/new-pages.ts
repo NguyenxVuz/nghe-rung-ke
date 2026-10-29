@@ -16,12 +16,36 @@ const statusLevel = (status: string): string => {
 
 const cardMarkup = (number: string, name: string, image: string, status: string, description: string): string => `
   <button class="species-card" type="button" data-species-card data-number="${escapeHtml(number)}" data-name="${escapeHtml(name)}" data-image="${escapeHtml(image)}" data-status="${escapeHtml(status)}" data-description="${escapeHtml(description)}">
-    <img src="${escapeHtml(image)}" alt="Ảnh minh họa: ${escapeHtml(name)}" width="600" height="400" loading="lazy" decoding="async" />
-    <span class="species-card-number">${escapeHtml(number)}</span>
+    <span class="species-card-visual">
+      <img src="${escapeHtml(image)}" alt="Ảnh minh họa: ${escapeHtml(name)}" width="600" height="400" loading="lazy" decoding="async" />
+      <span class="species-card-number">${escapeHtml(number)}</span>
+      <span class="species-card-open-icon" aria-hidden="true">↗</span>
+    </span>
     <strong>${escapeHtml(name)}</strong>
     <span class="species-status-badge species-status-${statusLevel(status)}"><b>Tình trạng</b>: ${escapeHtml(status)}</span>
     <span class="species-description"><b>Đặc điểm nhận diện</b>: ${escapeHtml(description)}</span>
+    <span class="species-card-open">Mở thẻ loài <span aria-hidden="true">→</span></span>
   </button>`;
+
+const openSpeciesCard = (species: typeof speciesCards[number]): void => {
+  const dialog = document.querySelector<HTMLDialogElement>('#species-dialog');
+  const image = document.querySelector<HTMLImageElement>('#species-dialog-image');
+  const number = document.querySelector<HTMLElement>('#species-dialog-number');
+  const title = document.querySelector<HTMLElement>('#species-dialog-title');
+  const status = document.querySelector<HTMLElement>('#species-dialog-status');
+  const description = document.querySelector<HTMLElement>('#species-dialog-description');
+  if (!dialog || !image || !number || !title || !status || !description) {
+    throw new Error('Không tìm thấy thành phần thẻ sinh vật.');
+  }
+
+  image.src = species.image;
+  image.alt = `Ảnh minh họa: ${species.name}`;
+  number.textContent = species.number;
+  title.textContent = species.name;
+  status.textContent = species.status;
+  description.textContent = species.description;
+  dialog.showModal();
+};
 
 const renderSpecies = (): void => {
   const container = document.querySelector<HTMLElement>('#species-groups');
@@ -36,25 +60,15 @@ const renderSpecies = (): void => {
         .join('')}</div>
     </section>`).join('');
 
-  const dialog = document.querySelector<HTMLDialogElement>('#species-dialog');
-  const image = document.querySelector<HTMLImageElement>('#species-dialog-image');
-  const number = document.querySelector<HTMLElement>('#species-dialog-number');
-  const title = document.querySelector<HTMLElement>('#species-dialog-title');
-  const status = document.querySelector<HTMLElement>('#species-dialog-status');
-  const description = document.querySelector<HTMLElement>('#species-dialog-description');
-  if (!dialog || !image || !number || !title || !status || !description) {
+  if (!document.querySelector<HTMLDialogElement>('#species-dialog')) {
     throw new Error('Không tìm thấy thành phần thẻ sinh vật.');
   }
 
   container.querySelectorAll<HTMLButtonElement>('[data-species-card]').forEach((card) => {
     card.addEventListener('click', () => {
-      image.src = card.dataset.image ?? '';
-      image.alt = `Ảnh minh họa: ${card.dataset.name ?? ''}`;
-      number.textContent = card.dataset.number ?? '';
-      title.textContent = card.dataset.name ?? '';
-      status.textContent = card.dataset.status ?? '';
-      description.textContent = card.dataset.description ?? '';
-      dialog.showModal();
+      const species = speciesCards.find((item) => item.name === card.dataset.name);
+      if (!species) throw new Error(`Không tìm thấy dữ liệu loài: ${card.dataset.name ?? ''}`);
+      openSpeciesCard(species);
     });
   });
 };
@@ -92,6 +106,21 @@ const setupSpeciesFilters = (): void => {
   buttons[0]?.click();
 };
 
+const setupRescueSpeciesTags = (): void => {
+  const filterButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-species-filter]'));
+  document.querySelectorAll<HTMLButtonElement>('[data-species-target]').forEach((tag) => {
+    tag.addEventListener('click', () => {
+      const species = speciesCards.find((item) => item.name === tag.dataset.speciesTarget);
+      if (!species) throw new Error(`Không tìm thấy dữ liệu loài: ${tag.dataset.speciesTarget ?? ''}`);
+
+      const filterButton = filterButtons.find((button) => button.dataset.speciesFilter === species.group);
+      if (!filterButton) throw new Error(`Không tìm thấy nhóm loài: ${species.group}`);
+      filterButton.click();
+      openSpeciesCard(species);
+    });
+  });
+};
+
 const setupMagazineReveal = (): void => {
   const items = document.querySelectorAll<HTMLElement>(
     '.rescue-story-card, .rescue-love li, .rescue-home li, .species-card, .trip-activities article, .volunteer-sections > article, .volunteer-links a',
@@ -120,6 +149,7 @@ const setupMagazineReveal = (): void => {
 
 renderSpecies();
 setupSpeciesFilters();
+setupRescueSpeciesTags();
 setupMagazineReveal();
 document.querySelector('#species-dialog .dialog-close')?.addEventListener('click', () => {
   document.querySelector<HTMLDialogElement>('#species-dialog')?.close();

@@ -112,11 +112,19 @@ export const speciesCards: SpeciesCard[] = [
   },
   {
     number: '14',
-    name: 'Rùa cạn & Rùa nước ngọt',
+    name: 'Rùa cạn',
     group: speciesGroups[2],
     image: '/assets/species-placeholder.svg',
-    status: 'Đa số thuộc nhóm IB - IIB',
-    description: 'Rùa nước có mai dẹt hơn, màng bơi rõ rệt giữa các ngón chân, thường nằm phơi nắng trên các thân gỗ mục quanh hồ trung tâm cứu hộ.',
+    status: 'Tình trạng tùy loài, đang được cập nhật',
+    description: 'Rùa cạn có mai gồ cao và chân thích nghi với việc đi lại trên mặt đất.',
+  },
+  {
+    number: '18',
+    name: 'Rùa nước ngọt',
+    group: speciesGroups[2],
+    image: '/assets/species-placeholder.svg',
+    status: 'Tình trạng tùy loài, đang được cập nhật',
+    description: 'Rùa nước ngọt có màng bơi giữa các ngón chân và thường sống gắn với môi trường nước.',
   },
   {
     number: '15',
