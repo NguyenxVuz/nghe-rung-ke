@@ -240,7 +240,10 @@ h1 em, h2 em { color: var(--gold); font-weight: inherit; }
 .about-hero { background-position: center 44%; }
 .about-hero > div { max-width: 1120px; }
 .about-hero h1 span, .about-hero h1 { white-space: nowrap; }
-.story-hero { background-position: center 55%; }
+.story-hero {
+  background-image: linear-gradient(90deg, rgba(5,29,20,.9), rgba(5,29,20,.28)), url('/assets/drive-images/story-general.jpg');
+  background-position: center 55%;
+}
 .join-hero { background-position: center 37%; }
 .editorial-layout { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(45px, 9vw, 140px); align-items: start; }
 .editorial-copy { max-width: 760px; }
@@ -769,8 +772,23 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
   line-height: 1.75;
   color: rgba(255, 255, 255, .82);
 }
-.rescue-page .rescue-hero { min-height: 100svh; }
-.volunteer-page .volunteer-hero { min-height: min(820px, 88svh); }
+.rescue-page .rescue-hero {
+  min-height: 100svh;
+  background-image: linear-gradient(90deg, rgba(5, 24, 18, .84), rgba(5, 24, 18, .18) 90%),
+    linear-gradient(0deg, rgba(5, 24, 18, .72), transparent 76%),
+    url('/assets/drive-images/cover-rescue.jpg');
+}
+.volunteer-page .volunteer-hero {
+  min-height: min(820px, 88svh);
+  background-image: linear-gradient(90deg, rgba(5, 24, 18, .84), rgba(5, 24, 18, .18) 90%),
+    linear-gradient(0deg, rgba(5, 24, 18, .72), transparent 76%),
+    url('/assets/drive-images/cover-volunteer.jpg');
+}
+.trip-page .trip-hero {
+  background-image: linear-gradient(90deg, rgba(5, 24, 18, .84), rgba(5, 24, 18, .18) 90%),
+    linear-gradient(0deg, rgba(5, 24, 18, .72), transparent 76%),
+    url('/assets/drive-images/cover-trip.jpg');
+}
 .volunteer-page .volunteer-hero h1 { max-width: 850px; font-size: clamp(42px, 6vw, 78px); }
 .volunteer-page .volunteer-hero .button {
   min-height: 56px;
