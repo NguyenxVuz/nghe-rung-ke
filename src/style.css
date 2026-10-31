@@ -441,6 +441,7 @@ h1 em, h2 em { color: var(--gold); font-weight: inherit; }
 .species-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
 .species-card-visual { position: relative; display: block; width: 100%; overflow: hidden; aspect-ratio: 4 / 3; background: var(--forest-900); }
 .species-card-visual::after { position: absolute; inset: 30% 0 0; background: linear-gradient(180deg, transparent, rgba(5, 24, 18, .35)); content: ''; pointer-events: none; }
+.species-card[data-name="Chim Công"] .species-card-visual::after { display: none; }
 .species-card img { width: 100%; height: 100%; object-fit: cover; object-position: center 42%; background: var(--forest-900); transition: transform .55s cubic-bezier(.2, .7, .2, 1); }
 .species-card:hover img { transform: scale(1.055); }
 .species-card > :not(.species-card-visual) { margin-inline: 18px; }
@@ -1052,7 +1053,7 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
 }
 .species-card:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
 .species-card-visual {
-  aspect-ratio: 1.45;
+  aspect-ratio: 4 / 5;
   border-radius: 19px 19px 0 0;
   background: var(--forest-900);
 }
@@ -1178,7 +1179,7 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
   color: var(--ink);
   font-size: 23px;
 }
-#species-dialog-image { aspect-ratio: 16 / 9; border-radius: 16px; background: var(--cream) url('/assets/species-placeholder.svg') center/cover; }
+#species-dialog-image { aspect-ratio: 4 / 5; border-radius: 16px; background: var(--cream) url('/assets/species-placeholder.svg') center/cover; }
 #species-dialog-number { margin-top: 22px; color: var(--forest-600); font-size: 12px; letter-spacing: .14em; }
 #species-dialog > h2 { margin: 5px 0 20px; font-size: clamp(30px, 5vw, 48px); }
 #species-dialog > p { margin-inline: 0; font-size: 15px; line-height: 1.75; }

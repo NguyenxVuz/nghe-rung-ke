@@ -107,18 +107,24 @@ const setupSpeciesFilters = (): void => {
 };
 
 const setupRescueSpeciesTags = (): void => {
-  const filterButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-species-filter]'));
-  document.querySelectorAll<HTMLButtonElement>('[data-species-target]').forEach((tag) => {
-    tag.addEventListener('click', () => {
-      const species = speciesCards.find((item) => item.name === tag.dataset.speciesTarget);
-      if (!species) throw new Error(`Không tìm thấy dữ liệu loài: ${tag.dataset.speciesTarget ?? ''}`);
+  const container = document.querySelector<HTMLElement>('.rescue-tags');
+  if (!container) return;
 
+  const filterButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-species-filter]'));
+  container.replaceChildren(...speciesCards.map((species) => {
+    const tag = document.createElement('button');
+    tag.className = 'rescue-tag';
+    tag.type = 'button';
+    tag.dataset.speciesTarget = species.name;
+    tag.textContent = species.name;
+    tag.addEventListener('click', () => {
       const filterButton = filterButtons.find((button) => button.dataset.speciesFilter === species.group);
       if (!filterButton) throw new Error(`Không tìm thấy nhóm loài: ${species.group}`);
       filterButton.click();
       openSpeciesCard(species);
     });
-  });
+    return tag;
+  }));
 };
 
 const setupMagazineReveal = (): void => {
