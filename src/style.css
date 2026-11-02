@@ -420,7 +420,15 @@ h1 em, h2 em { color: var(--gold); font-weight: inherit; }
 .rescue-story-card { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); gap: clamp(25px, 5vw, 70px); align-items: center; max-width: 1200px; margin: 48px auto; padding: 26px; border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow); }
 .rescue-story-card.reverse { grid-template-columns: minmax(0, 1.2fr) minmax(220px, .8fr); }
 .rescue-story-card.reverse img { order: 2; }
-.rescue-story-card img, .trip-lead img, .trip-activities img, .trip-closing img, #species-dialog-image { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--cream); }
+.rescue-story-card img, #species-dialog-image { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--cream); }
+.trip-lead img, .trip-activities img, .trip-closing img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  background: transparent;
+}
 .rescue-story-card h3, .trip-activities h3, .trip-closing h3 { margin: 0 0 14px; font-family: var(--serif); font-size: clamp(22px, 2.5vw, 34px); font-weight: 400; line-height: 1.35; }
 .rescue-story-card p, .rescue-love li, .rescue-home li, .trip-activities p, .trip-closing p { color: var(--muted); }
 .rescue-love, .trip-section { background: var(--cream); }
@@ -455,14 +463,29 @@ h1 em, h2 em { color: var(--gold); font-weight: inherit; }
 #species-dialog > h2 { font-size: 30px; }
 .trip-lead { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: clamp(26px, 5vw, 68px); }
 .trip-lead figure { margin: 0; }
-.trip-lead img { aspect-ratio: 1.25; border-radius: 18px; }
+.trip-lead img { border-radius: 18px; }
 .trip-lead figcaption { margin-top: 8px; color: var(--muted); font-size: 12px; }
 .trip-activities { display: grid; gap: 28px; margin-top: 54px; }
-.trip-activities article { display: grid; grid-template-columns: minmax(220px, .85fr) minmax(0, 1.15fr); align-items: center; gap: clamp(25px, 5vw, 65px); padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.trip-activities article { display: grid; min-width: 0; grid-template-columns: minmax(220px, .85fr) minmax(0, 1.15fr); align-items: center; gap: clamp(25px, 5vw, 65px); padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
 .trip-activities article.reverse { grid-template-columns: minmax(0, 1.15fr) minmax(220px, .85fr); }
 .trip-activities article.reverse img { order: 2; }
 .trip-activities img { border-radius: 10px; }
-.trip-activities p { margin-bottom: 0; }
+.trip-activities article > div { min-width: 0; }
+.trip-activities h3 {
+  margin-bottom: 16px;
+  color: var(--ink);
+  font-size: clamp(29px, 3.2vw, 44px);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -.035em;
+  text-wrap: pretty;
+}
+.trip-activities p {
+  margin-bottom: 0;
+  font-size: clamp(15px, 1.2vw, 17px);
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
 .trip-closing { display: grid; grid-template-columns: 1fr .8fr; align-items: center; gap: clamp(25px, 5vw, 65px); margin-top: 44px; padding: 28px; border-radius: 12px; background: var(--forest-950); color: white; }
 .trip-closing p { color: rgba(255,255,255,.72); }
 .trip-closing img { border-radius: 10px; }
@@ -700,7 +723,6 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
   .species-filters { align-items: stretch; flex-direction: column; }
   .species-filter { width: 100%; }
   .volunteer-links { grid-template-columns: 1fr; }
-  .trip-lead img, .trip-activities img, .trip-closing img { aspect-ratio: 4 / 3; }
 }
 
 @media (min-width: 761px) {
@@ -789,9 +811,47 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
     url('/assets/drive-images/cover-volunteer.jpg');
 }
 .trip-page .trip-hero {
-  background-image: linear-gradient(90deg, rgba(5, 24, 18, .84), rgba(5, 24, 18, .18) 90%),
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-top: clamp(150px, 22vh, 230px);
+  padding-right: clamp(42px, 7vw, 100px);
+  padding-left: clamp(22px, 5vw, 80px);
+  background-image: linear-gradient(270deg, rgba(5, 24, 18, .8), rgba(5, 24, 18, .48) 27%, rgba(5, 24, 18, .04) 62%),
     linear-gradient(0deg, rgba(5, 24, 18, .72), transparent 76%),
     url('/assets/drive-images/cover-trip.jpg');
+  background-position: center bottom;
+}
+.trip-page .trip-hero > div {
+  width: min(21vw, 300px);
+  min-width: 260px;
+  margin-left: auto;
+  text-align: right;
+}
+.trip-page .trip-hero h1 {
+  max-width: 100%;
+  font-size: clamp(36px, 3.8vw, 52px);
+  text-wrap: pretty;
+}
+@media (min-width: 761px) and (max-width: 1050px) {
+  .trip-page .trip-hero {
+    padding-right: clamp(36px, 6vw, 64px);
+    background-position: right bottom;
+  }
+}
+@media (max-width: 760px) {
+  .trip-page .trip-hero {
+    align-items: flex-start;
+    padding: 145px 22px 65px;
+    background-image: linear-gradient(270deg, rgba(5, 24, 18, .88), rgba(5, 24, 18, .55) 58%, rgba(5, 24, 18, .08)),
+      linear-gradient(0deg, rgba(5, 24, 18, .72), transparent 76%),
+      url('/assets/drive-images/cover-trip.jpg');
+    background-position: 72% bottom;
+  }
+  .trip-page .trip-hero > div {
+    width: min(78vw, 390px);
+    min-width: 0;
+  }
+  .trip-page .trip-hero h1 { font-size: clamp(36px, 9vw, 48px); }
 }
 .volunteer-page .volunteer-hero h1 { max-width: 850px; font-size: clamp(42px, 6vw, 78px); }
 .volunteer-page .volunteer-hero .button {
@@ -1203,7 +1263,7 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
   border-radius: 22px;
   content: '';
 }
-.trip-lead img { aspect-ratio: 1.25; border-radius: 22px; box-shadow: var(--editorial-shadow); }
+.trip-lead img { border-radius: 22px; box-shadow: var(--editorial-shadow); }
 .trip-lead figcaption { margin: 12px 8px 0; font-size: 12px; letter-spacing: .025em; }
 .trip-lead > p { margin: 0; font-size: clamp(17px, 1.5vw, 20px); }
 .trip-activities { max-width: 1300px; margin: 88px auto 0; gap: 34px; }
@@ -1217,8 +1277,8 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
 }
 .trip-activities article.reverse { grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr); }
 .trip-activities article.reverse img { order: 2; }
-.trip-activities img { aspect-ratio: 1.22; border-radius: 16px; }
-.trip-activities h3, .trip-closing h3 { font-size: clamp(26px, 3.2vw, 42px); }
+.trip-activities img { border-radius: 16px; }
+.trip-activities h3 { font-size: clamp(29px, 3.2vw, 44px); }
 .trip-activities p { margin: 0; }
 .trip-closing {
   position: relative;
@@ -1246,11 +1306,14 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
   font: 500 clamp(20px, 2.4vw, 31px)/1.55 var(--serif);
 }
 .trip-closing img {
-  align-self: stretch;
-  min-height: 250px;
+  align-self: center;
+  min-height: 0;
+  height: auto;
+  aspect-ratio: auto;
   border-radius: 18px;
-  opacity: .76;
-  mix-blend-mode: screen;
+  object-fit: contain;
+  opacity: 1;
+  mix-blend-mode: normal;
 }
 .volunteer-page .volunteer-sections { max-width: 1180px; padding-top: 60px; padding-bottom: 90px; }
 .volunteer-sections article {
@@ -1367,6 +1430,12 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
   .rescue-page .rescue-hero { min-height: 100svh; }
   .volunteer-page .volunteer-hero { min-height: 82svh; }
   .rescue-page .page-hero h1, .volunteer-page .page-hero h1 { font-size: clamp(42px, 12vw, 60px); }
+  .trip-page .trip-hero {
+    padding: 145px 32px 65px;
+    background-position: 72% bottom;
+  }
+  .trip-page .trip-hero > div { width: min(62vw, 320px); }
+  .trip-page .trip-hero h1 { font-size: clamp(34px, 8vw, 46px); }
   .rescue-species-intro { padding-top: 64px; padding-bottom: 58px; }
   .rescue-tags {
     flex-wrap: nowrap;
@@ -1434,9 +1503,8 @@ fieldset input { accent-color: var(--forest-600); } fieldset label span { font-s
   .trip-activities { margin-top: 58px; gap: 18px; }
   .trip-activities article, .trip-activities article.reverse { gap: 20px; padding: 14px; border-radius: 18px; }
   .trip-activities article.reverse img { order: 0; }
-  .trip-activities img { aspect-ratio: 4 / 3; }
   .trip-closing { min-height: auto; gap: 18px; margin-top: 54px; padding: 24px; border-radius: 20px; }
-  .trip-closing img { min-height: 170px; }
+  .trip-closing img { align-self: center; min-height: 0; aspect-ratio: auto; }
   .volunteer-page .volunteer-sections { padding-top: 42px; padding-bottom: 64px; }
   .volunteer-sections article { margin: 14px 0; padding: 27px 22px; border-radius: 16px; }
   .volunteer-sections article::before { top: 25px; right: 22px; font-size: 26px; }

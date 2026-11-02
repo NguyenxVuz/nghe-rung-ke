@@ -103,7 +103,7 @@ export const speciesCards: SpeciesCard[] = [
     description: 'Bộ lông màu xanh lục ánh kim lấp lánh; hai vệt má màu vàng sáng; cá thể đực sở hữu chùm lông đuôi dài quét đất với hàng chục họa tiết "mắt ngọc" rực rỡ xòe rộng khi múa gọi bạn tình.',
   },
   {
-    number: '11',
+    number: '12',
     name: 'Chim Đại bàng',
     group: speciesGroups[1],
     image: '/assets/drive-images/species-eagle.jpg',
@@ -111,7 +111,7 @@ export const speciesCards: SpeciesCard[] = [
     description: 'Chim săn mồi cỡ lớn với mỏ quặp khỏe, móng vuốt sắc và thị lực tốt.',
   },
   {
-    number: '12',
+    number: '13',
     name: 'Gà lôi trắng',
     group: speciesGroups[1],
     image: '/assets/drive-images/species-white-pheasant.jpg',
@@ -119,7 +119,7 @@ export const speciesCards: SpeciesCard[] = [
     description: 'Loài chim họ trĩ có bộ lông trắng nổi bật; con trống có mào và đuôi dài.',
   },
   {
-    number: '13',
+    number: '14',
     name: 'Rùa núi vàng',
     group: speciesGroups[2],
     image: '/assets/drive-images/species-golden-turtle.jpg',
@@ -127,7 +127,7 @@ export const speciesCards: SpeciesCard[] = [
     description: 'Mai dài gồ cao, có màu vàng nhạt hoặc vàng đất xen kẽ các đốm đen bất đối xứng; đầu màu vàng sáng (mùa sinh sản chuyển dần sang hồng quanh mắt và mũi); chân hình trụ chuyên đi bộ trên cạn.',
   },
   {
-    number: '14',
+    number: '15',
     name: 'Rùa núi đất',
     group: speciesGroups[2],
     image: '/assets/drive-images/species-land-tortoise.jpg',
@@ -135,7 +135,7 @@ export const speciesCards: SpeciesCard[] = [
     description: 'Rùa núi đất có mai gồ cao và chân chắc khỏe, thích nghi với việc đi lại trên cạn.',
   },
   {
-    number: '15',
+    number: '16',
     name: 'Cá sấu xiêm',
     group: speciesGroups[2],
     image: '/assets/drive-images/species-crocodile.jpg',
@@ -143,7 +143,7 @@ export const speciesCards: SpeciesCard[] = [
     description: 'Lớp da sần sùi màu xanh xám/ô-liu; mõm rộng phẳng, phía sau gáy có các tấm vảy gồ nổi cao; thường nằm bất động thả trôi mình mô phỏng khúc gỗ mục rình mồi.',
   },
   {
-    number: '16',
+    number: '17',
     name: 'Trăn gấm & Trăn đất',
     group: speciesGroups[2],
     image: '/assets/drive-images/species-python.jpg',
