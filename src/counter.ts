@@ -42,6 +42,7 @@ interface ForestState {
 
 const CURRENT_TREE_KEY = 'ngheRungKe_currentTreeId';
 const TARGET_TREES = 200;
+const DEMO_DISPLAYED_TREE_COUNT = 238;
 
 const createShareCaption = (): string => `🌳 CÙNG THẮP XANH BẢN ĐỒ BÙ GIA MẬP
 
@@ -266,8 +267,9 @@ const renderForest = (state: ForestState): void => {
   const emptyMap = document.querySelector<HTMLElement>('#empty-map');
   if (!totalElement || !remainingElement || !progressElement || !progressLabel || !progressPercent || !progressCopy || !emptyMap) return;
 
-  const total = state.trees.filter((tree) => tree.status === 'CONFIRMED').length;
+  const total = DEMO_DISPLAYED_TREE_COUNT;
   const progress = Math.min(100, Math.round((total / state.target) * 100));
+  const progressValue = Math.min(total, state.target);
   const currentTreeId = sessionStorage.getItem(CURRENT_TREE_KEY) ?? sessionStorage.getItem('nghe-rung-ke:last-confirmed-tree-id');
   initForestMap();
   renderTreeMarkers(state.trees.map((tree) => ({
@@ -284,7 +286,7 @@ const renderForest = (state: ForestState): void => {
   totalElement.textContent = String(total);
   remainingElement.textContent = String(Math.max(0, state.target - total));
   progressElement.style.width = `${progress}%`;
-  progressElement.setAttribute('aria-valuenow', String(total));
+  progressElement.setAttribute('aria-valuenow', String(progressValue));
   progressLabel.innerHTML = `<span class="toolbar-leaf" aria-hidden="true"></span> ${progress}% MỤC TIÊU`;
   progressPercent.textContent = `${progress}% mục tiêu`;
   progressCopy.textContent = `Còn ${Math.max(0, state.target - total)} mầm nữa để cùng phủ xanh Bù Gia Mập`;
